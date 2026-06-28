@@ -14,6 +14,7 @@ import { Route as CitizenRouteImport } from './routes/citizen'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CompanyIndexRouteImport } from './routes/company.index'
 import { Route as CitizenIndexRouteImport } from './routes/citizen.index'
+import { Route as CompanyStatsRouteImport } from './routes/company.stats'
 import { Route as CompanyOrdersRouteImport } from './routes/company.orders'
 import { Route as CompanyFeedRouteImport } from './routes/company.feed'
 import { Route as CitizenWalletRouteImport } from './routes/citizen.wallet'
@@ -45,6 +46,11 @@ const CitizenIndexRoute = CitizenIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => CitizenRoute,
+} as any)
+const CompanyStatsRoute = CompanyStatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
+  getParentRoute: () => CompanyRoute,
 } as any)
 const CompanyOrdersRoute = CompanyOrdersRouteImport.update({
   id: '/orders',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/citizen/wallet': typeof CitizenWalletRoute
   '/company/feed': typeof CompanyFeedRoute
   '/company/orders': typeof CompanyOrdersRoute
+  '/company/stats': typeof CompanyStatsRoute
   '/citizen/': typeof CitizenIndexRoute
   '/company/': typeof CompanyIndexRoute
 }
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/citizen/wallet': typeof CitizenWalletRoute
   '/company/feed': typeof CompanyFeedRoute
   '/company/orders': typeof CompanyOrdersRoute
+  '/company/stats': typeof CompanyStatsRoute
   '/citizen': typeof CitizenIndexRoute
   '/company': typeof CompanyIndexRoute
 }
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/citizen/wallet': typeof CitizenWalletRoute
   '/company/feed': typeof CompanyFeedRoute
   '/company/orders': typeof CompanyOrdersRoute
+  '/company/stats': typeof CompanyStatsRoute
   '/citizen/': typeof CitizenIndexRoute
   '/company/': typeof CompanyIndexRoute
 }
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/citizen/wallet'
     | '/company/feed'
     | '/company/orders'
+    | '/company/stats'
     | '/citizen/'
     | '/company/'
   fileRoutesByTo: FileRoutesByTo
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/citizen/wallet'
     | '/company/feed'
     | '/company/orders'
+    | '/company/stats'
     | '/citizen'
     | '/company'
   id:
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/citizen/wallet'
     | '/company/feed'
     | '/company/orders'
+    | '/company/stats'
     | '/citizen/'
     | '/company/'
   fileRoutesById: FileRoutesById
@@ -197,6 +209,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/citizen/'
       preLoaderRoute: typeof CitizenIndexRouteImport
       parentRoute: typeof CitizenRoute
+    }
+    '/company/stats': {
+      id: '/company/stats'
+      path: '/stats'
+      fullPath: '/company/stats'
+      preLoaderRoute: typeof CompanyStatsRouteImport
+      parentRoute: typeof CompanyRoute
     }
     '/company/orders': {
       id: '/company/orders'
@@ -265,12 +284,14 @@ const CitizenRouteWithChildren =
 interface CompanyRouteChildren {
   CompanyFeedRoute: typeof CompanyFeedRoute
   CompanyOrdersRoute: typeof CompanyOrdersRoute
+  CompanyStatsRoute: typeof CompanyStatsRoute
   CompanyIndexRoute: typeof CompanyIndexRoute
 }
 
 const CompanyRouteChildren: CompanyRouteChildren = {
   CompanyFeedRoute: CompanyFeedRoute,
   CompanyOrdersRoute: CompanyOrdersRoute,
+  CompanyStatsRoute: CompanyStatsRoute,
   CompanyIndexRoute: CompanyIndexRoute,
 }
 
