@@ -47,8 +47,8 @@ function NewShipment() {
     <>
       <AppHeader
         back={
-          <Link to="/citizen" aria-label="رجوع">
-            <IconBtn as="span"><ArrowRight size={18} /></IconBtn>
+          <Link to="/citizen" aria-label="رجوع" className="grid h-11 w-11 place-items-center rounded-full bg-surface text-foreground shadow-[0_4px_14px_-4px_oklch(0.6_0.15_250/0.25)] transition active:scale-90">
+            <ArrowRight size={18} />
           </Link>
         }
         title="وجبة جديدة"
