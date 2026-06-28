@@ -1,6 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { Bell, Camera, ChevronLeft, MapPin, Megaphone } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
-import { MATERIALS, SAMPLE_SHIPMENTS } from "@/lib/tadweer-data";
+import { IconBtn } from "@/components/IconBtn";
+import { MATERIALS, statusMeta, timeAgo, type ShipmentRow } from "@/lib/tadweer-data";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/citizen/")({
   head: () => ({ meta: [{ title: "الرئيسية — تدوير بلو" }] }),
@@ -8,35 +13,54 @@ export const Route = createFileRoute("/citizen/")({
 });
 
 function CitizenHome() {
-  const mine = SAMPLE_SHIPMENTS.slice(0, 3);
+  const { profile, user } = useAuth();
+  const myQ = useQuery({
+    queryKey: ["my-shipments", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("shipments")
+        .select("*")
+        .eq("citizen_id", user!.id)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      return (data ?? []) as ShipmentRow[];
+    },
+  });
+  const adQ = useQuery({
+    queryKey: ["home-ads"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("company_ads")
+        .select("id,title,description,image_url,price_per_kg,material")
+        .eq("active", true)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      return data ?? [];
+    },
+  });
+
+  const firstChar = (profile?.full_name?.trim()?.[0] ?? "ت").toUpperCase();
   return (
     <>
       <AppHeader
         avatar={
           <div className="grid h-11 w-11 place-items-center rounded-full bg-primary-soft text-lg font-extrabold text-primary">
-            أ
+            {firstChar}
           </div>
         }
-        subtitle="موقعك الحالي"
+        subtitle="موقعك"
         title={
           <span className="inline-flex items-center gap-1">
-            <span className="text-primary">📍</span> بغداد، الكرادة
+            <MapPin size={14} className="text-primary" /> {profile?.city ?? "بغداد"}
           </span>
         }
-        right={
-          <button className="grid h-11 w-11 place-items-center rounded-full bg-surface text-lg shadow-[0_4px_14px_-4px_oklch(0.6_0.15_250/0.25)]">
-            🔔
-          </button>
-        }
+        right={<IconBtn aria-label="الإشعارات"><Bell size={18} /></IconBtn>}
       />
 
       <section className="mt-2">
-        <p className="text-sm text-muted-foreground">أهلاً أحمد 👋</p>
-        <h2 className="mt-1 text-2xl font-black leading-tight">
-          صوّر موادك،
-          <br />
-          واكسب من بيتك.
-        </h2>
+        <p className="text-sm text-muted-foreground">أهلاً {profile?.full_name?.split(" ")[0] ?? "بك"} 👋</p>
+        <h2 className="mt-1 text-2xl font-black leading-tight">صوّر موادك،<br />واكسب من بيتك.</h2>
       </section>
 
       <Link
@@ -45,9 +69,9 @@ function CitizenHome() {
       >
         <div className="text-right">
           <p className="text-xs/4 opacity-90">ابدأ الآن</p>
-          <p className="text-xl font-extrabold">📸 صوّر واكسب الآن</p>
+          <p className="inline-flex items-center gap-2 text-xl font-extrabold"><Camera size={22} /> صوّر واكسب</p>
         </div>
-        <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white/20 text-2xl">←</div>
+        <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white/20"><ChevronLeft size={26} /></div>
       </Link>
 
       <section className="mt-8">
@@ -57,9 +81,9 @@ function CitizenHome() {
             <Link
               key={key}
               to="/citizen/new"
-              className="glass-card flex flex-col items-center gap-1 rounded-2xl py-3"
+              className="glass-card flex flex-col items-center gap-1 rounded-2xl py-3 transition active:scale-90"
             >
-              <span className="text-2xl">{m.icon}</span>
+              <m.Icon size={22} style={{ color: m.color }} />
               <span className="text-[10px] font-bold">{m.label}</span>
             </Link>
           ))}
@@ -69,31 +93,31 @@ function CitizenHome() {
       <section className="mt-8">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-extrabold">شحناتي الحالية</h3>
-          <Link to="/citizen/shipments" className="text-xs font-bold text-primary">
-            عرض الكل ←
-          </Link>
+          <Link to="/citizen/shipments" className="text-xs font-bold text-primary">عرض الكل ←</Link>
         </div>
         <div className="flex flex-col gap-3">
-          {mine.map((s) => {
+          {(myQ.data ?? []).length === 0 && (
+            <div className="glass-card rounded-2xl p-6 text-center text-sm text-muted-foreground">
+              لا توجد شحنات بعد — ابدأ بنشر أول وجبة الآن!
+            </div>
+          )}
+          {(myQ.data ?? []).map((s) => {
             const m = MATERIALS[s.material];
-            const dot = s.status === "pending" ? "🟡" : s.status === "accepted" ? "🔵" : "🟢";
-            const status =
-              s.status === "pending" ? "قيد الانتظار" : s.status === "accepted" ? "تم القبول" : "تم الاستلام";
+            const meta = statusMeta(s.status);
             return (
               <div key={s.id} className="glass-card flex items-center gap-3 rounded-2xl p-3">
-                <div
-                  className="grid h-14 w-14 shrink-0 place-items-center rounded-xl text-2xl"
-                  style={{ background: `color-mix(in oklab, ${m.color} 18%, white)` }}
-                >
-                  {m.icon}
+                <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl" style={{ background: `color-mix(in oklab, ${m.color} 18%, white)` }}>
+                  <m.Icon size={24} style={{ color: m.color }} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-extrabold">{m.label} — {s.weightKg} كغ</p>
-                  <p className="truncate text-[11px] text-muted-foreground">📍 {s.area}</p>
+                  <p className="truncate text-sm font-extrabold">{m.label} — {s.weight_kg} كغ</p>
+                  <p className="truncate text-[11px] text-muted-foreground inline-flex items-center gap-1"><MapPin size={11} /> {s.area}</p>
                 </div>
                 <div className="shrink-0 text-left">
-                  <p className="text-[11px] font-bold">{dot} {status}</p>
-                  <p className="mt-0.5 text-[10px] text-muted-foreground">{s.postedAt}</p>
+                  <span className={`inline-flex items-center gap-1 text-[11px] font-bold ${meta.color}`}>
+                    <span className={`h-2 w-2 rounded-full ${meta.dot}`} /> {meta.label}
+                  </span>
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">{timeAgo(s.created_at)}</p>
                 </div>
               </div>
             );
@@ -101,9 +125,29 @@ function CitizenHome() {
         </div>
       </section>
 
-      <div className="mt-6 rounded-2xl border border-dashed border-primary/30 bg-primary-soft/40 p-3 text-center text-[11px] text-muted-foreground">
-        مساحة إعلانية — رعاة التطبيق
-      </div>
+      {(adQ.data ?? []).length > 0 && (
+        <section className="mt-8">
+          <h3 className="mb-3 inline-flex items-center gap-2 text-sm font-extrabold"><Megaphone size={16} /> عروض الشركات</h3>
+          <div className="flex flex-col gap-3">
+            {(adQ.data ?? []).map((a) => (
+              <div key={a.id} className="glass-card flex items-center gap-3 rounded-2xl p-3">
+                <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-primary-soft">
+                  {a.image_url ? <img src={a.image_url} className="h-full w-full object-cover" alt="" /> : <Megaphone size={20} className="text-primary" />}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-extrabold">{a.title}</p>
+                  <p className="truncate text-[11px] text-muted-foreground">{a.description}</p>
+                </div>
+                {a.price_per_kg != null && (
+                  <span className="shrink-0 rounded-full bg-success/15 px-2 py-1 text-[10px] font-extrabold text-success">
+                    {a.price_per_kg} د.ع/كغ
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </>
   );
 }
