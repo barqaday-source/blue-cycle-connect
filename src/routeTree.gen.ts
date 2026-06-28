@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as CitizenRouteImport } from './routes/citizen'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CitizenIndexRouteImport } from './routes/citizen.index'
+import { Route as CitizenShipmentsRouteImport } from './routes/citizen.shipments'
 import { Route as CitizenNewRouteImport } from './routes/citizen.new'
 
 const CitizenRoute = CitizenRouteImport.update({
@@ -29,6 +30,11 @@ const CitizenIndexRoute = CitizenIndexRouteImport.update({
   path: '/',
   getParentRoute: () => CitizenRoute,
 } as any)
+const CitizenShipmentsRoute = CitizenShipmentsRouteImport.update({
+  id: '/shipments',
+  path: '/shipments',
+  getParentRoute: () => CitizenRoute,
+} as any)
 const CitizenNewRoute = CitizenNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -39,11 +45,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/citizen': typeof CitizenRouteWithChildren
   '/citizen/new': typeof CitizenNewRoute
+  '/citizen/shipments': typeof CitizenShipmentsRoute
   '/citizen/': typeof CitizenIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/citizen/new': typeof CitizenNewRoute
+  '/citizen/shipments': typeof CitizenShipmentsRoute
   '/citizen': typeof CitizenIndexRoute
 }
 export interface FileRoutesById {
@@ -51,14 +59,26 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/citizen': typeof CitizenRouteWithChildren
   '/citizen/new': typeof CitizenNewRoute
+  '/citizen/shipments': typeof CitizenShipmentsRoute
   '/citizen/': typeof CitizenIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/citizen' | '/citizen/new' | '/citizen/'
+  fullPaths:
+    | '/'
+    | '/citizen'
+    | '/citizen/new'
+    | '/citizen/shipments'
+    | '/citizen/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/citizen/new' | '/citizen'
-  id: '__root__' | '/' | '/citizen' | '/citizen/new' | '/citizen/'
+  to: '/' | '/citizen/new' | '/citizen/shipments' | '/citizen'
+  id:
+    | '__root__'
+    | '/'
+    | '/citizen'
+    | '/citizen/new'
+    | '/citizen/shipments'
+    | '/citizen/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -89,6 +109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CitizenIndexRouteImport
       parentRoute: typeof CitizenRoute
     }
+    '/citizen/shipments': {
+      id: '/citizen/shipments'
+      path: '/shipments'
+      fullPath: '/citizen/shipments'
+      preLoaderRoute: typeof CitizenShipmentsRouteImport
+      parentRoute: typeof CitizenRoute
+    }
     '/citizen/new': {
       id: '/citizen/new'
       path: '/new'
@@ -101,11 +128,13 @@ declare module '@tanstack/react-router' {
 
 interface CitizenRouteChildren {
   CitizenNewRoute: typeof CitizenNewRoute
+  CitizenShipmentsRoute: typeof CitizenShipmentsRoute
   CitizenIndexRoute: typeof CitizenIndexRoute
 }
 
 const CitizenRouteChildren: CitizenRouteChildren = {
   CitizenNewRoute: CitizenNewRoute,
+  CitizenShipmentsRoute: CitizenShipmentsRoute,
   CitizenIndexRoute: CitizenIndexRoute,
 }
 
