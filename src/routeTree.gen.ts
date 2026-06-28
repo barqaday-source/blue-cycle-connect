@@ -9,38 +9,198 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as CompanyRouteImport } from './routes/company'
+import { Route as CitizenRouteImport } from './routes/citizen'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CompanyIndexRouteImport } from './routes/company.index'
+import { Route as CitizenIndexRouteImport } from './routes/citizen.index'
+import { Route as CompanyStatsRouteImport } from './routes/company.stats'
+import { Route as CompanyProfileRouteImport } from './routes/company.profile'
+import { Route as CompanyOrdersRouteImport } from './routes/company.orders'
+import { Route as CompanyFeedRouteImport } from './routes/company.feed'
+import { Route as CitizenWalletRouteImport } from './routes/citizen.wallet'
+import { Route as CitizenShipmentsRouteImport } from './routes/citizen.shipments'
+import { Route as CitizenProfileRouteImport } from './routes/citizen.profile'
+import { Route as CitizenNewRouteImport } from './routes/citizen.new'
 
+const CompanyRoute = CompanyRouteImport.update({
+  id: '/company',
+  path: '/company',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CitizenRoute = CitizenRouteImport.update({
+  id: '/citizen',
+  path: '/citizen',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompanyIndexRoute = CompanyIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CompanyRoute,
+} as any)
+const CitizenIndexRoute = CitizenIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CitizenRoute,
+} as any)
+const CompanyStatsRoute = CompanyStatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
+  getParentRoute: () => CompanyRoute,
+} as any)
+const CompanyProfileRoute = CompanyProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => CompanyRoute,
+} as any)
+const CompanyOrdersRoute = CompanyOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => CompanyRoute,
+} as any)
+const CompanyFeedRoute = CompanyFeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
+  getParentRoute: () => CompanyRoute,
+} as any)
+const CitizenWalletRoute = CitizenWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => CitizenRoute,
+} as any)
+const CitizenShipmentsRoute = CitizenShipmentsRouteImport.update({
+  id: '/shipments',
+  path: '/shipments',
+  getParentRoute: () => CitizenRoute,
+} as any)
+const CitizenProfileRoute = CitizenProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => CitizenRoute,
+} as any)
+const CitizenNewRoute = CitizenNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => CitizenRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/citizen': typeof CitizenRouteWithChildren
+  '/company': typeof CompanyRouteWithChildren
+  '/citizen/new': typeof CitizenNewRoute
+  '/citizen/profile': typeof CitizenProfileRoute
+  '/citizen/shipments': typeof CitizenShipmentsRoute
+  '/citizen/wallet': typeof CitizenWalletRoute
+  '/company/feed': typeof CompanyFeedRoute
+  '/company/orders': typeof CompanyOrdersRoute
+  '/company/profile': typeof CompanyProfileRoute
+  '/company/stats': typeof CompanyStatsRoute
+  '/citizen/': typeof CitizenIndexRoute
+  '/company/': typeof CompanyIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/citizen/new': typeof CitizenNewRoute
+  '/citizen/profile': typeof CitizenProfileRoute
+  '/citizen/shipments': typeof CitizenShipmentsRoute
+  '/citizen/wallet': typeof CitizenWalletRoute
+  '/company/feed': typeof CompanyFeedRoute
+  '/company/orders': typeof CompanyOrdersRoute
+  '/company/profile': typeof CompanyProfileRoute
+  '/company/stats': typeof CompanyStatsRoute
+  '/citizen': typeof CitizenIndexRoute
+  '/company': typeof CompanyIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/citizen': typeof CitizenRouteWithChildren
+  '/company': typeof CompanyRouteWithChildren
+  '/citizen/new': typeof CitizenNewRoute
+  '/citizen/profile': typeof CitizenProfileRoute
+  '/citizen/shipments': typeof CitizenShipmentsRoute
+  '/citizen/wallet': typeof CitizenWalletRoute
+  '/company/feed': typeof CompanyFeedRoute
+  '/company/orders': typeof CompanyOrdersRoute
+  '/company/profile': typeof CompanyProfileRoute
+  '/company/stats': typeof CompanyStatsRoute
+  '/citizen/': typeof CitizenIndexRoute
+  '/company/': typeof CompanyIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/citizen'
+    | '/company'
+    | '/citizen/new'
+    | '/citizen/profile'
+    | '/citizen/shipments'
+    | '/citizen/wallet'
+    | '/company/feed'
+    | '/company/orders'
+    | '/company/profile'
+    | '/company/stats'
+    | '/citizen/'
+    | '/company/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/citizen/new'
+    | '/citizen/profile'
+    | '/citizen/shipments'
+    | '/citizen/wallet'
+    | '/company/feed'
+    | '/company/orders'
+    | '/company/profile'
+    | '/company/stats'
+    | '/citizen'
+    | '/company'
+  id:
+    | '__root__'
+    | '/'
+    | '/citizen'
+    | '/company'
+    | '/citizen/new'
+    | '/citizen/profile'
+    | '/citizen/shipments'
+    | '/citizen/wallet'
+    | '/company/feed'
+    | '/company/orders'
+    | '/company/profile'
+    | '/company/stats'
+    | '/citizen/'
+    | '/company/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CitizenRoute: typeof CitizenRouteWithChildren
+  CompanyRoute: typeof CompanyRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/company': {
+      id: '/company'
+      path: '/company'
+      fullPath: '/company'
+      preLoaderRoute: typeof CompanyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/citizen': {
+      id: '/citizen'
+      path: '/citizen'
+      fullPath: '/citizen'
+      preLoaderRoute: typeof CitizenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +208,122 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/company/': {
+      id: '/company/'
+      path: '/'
+      fullPath: '/company/'
+      preLoaderRoute: typeof CompanyIndexRouteImport
+      parentRoute: typeof CompanyRoute
+    }
+    '/citizen/': {
+      id: '/citizen/'
+      path: '/'
+      fullPath: '/citizen/'
+      preLoaderRoute: typeof CitizenIndexRouteImport
+      parentRoute: typeof CitizenRoute
+    }
+    '/company/stats': {
+      id: '/company/stats'
+      path: '/stats'
+      fullPath: '/company/stats'
+      preLoaderRoute: typeof CompanyStatsRouteImport
+      parentRoute: typeof CompanyRoute
+    }
+    '/company/profile': {
+      id: '/company/profile'
+      path: '/profile'
+      fullPath: '/company/profile'
+      preLoaderRoute: typeof CompanyProfileRouteImport
+      parentRoute: typeof CompanyRoute
+    }
+    '/company/orders': {
+      id: '/company/orders'
+      path: '/orders'
+      fullPath: '/company/orders'
+      preLoaderRoute: typeof CompanyOrdersRouteImport
+      parentRoute: typeof CompanyRoute
+    }
+    '/company/feed': {
+      id: '/company/feed'
+      path: '/feed'
+      fullPath: '/company/feed'
+      preLoaderRoute: typeof CompanyFeedRouteImport
+      parentRoute: typeof CompanyRoute
+    }
+    '/citizen/wallet': {
+      id: '/citizen/wallet'
+      path: '/wallet'
+      fullPath: '/citizen/wallet'
+      preLoaderRoute: typeof CitizenWalletRouteImport
+      parentRoute: typeof CitizenRoute
+    }
+    '/citizen/shipments': {
+      id: '/citizen/shipments'
+      path: '/shipments'
+      fullPath: '/citizen/shipments'
+      preLoaderRoute: typeof CitizenShipmentsRouteImport
+      parentRoute: typeof CitizenRoute
+    }
+    '/citizen/profile': {
+      id: '/citizen/profile'
+      path: '/profile'
+      fullPath: '/citizen/profile'
+      preLoaderRoute: typeof CitizenProfileRouteImport
+      parentRoute: typeof CitizenRoute
+    }
+    '/citizen/new': {
+      id: '/citizen/new'
+      path: '/new'
+      fullPath: '/citizen/new'
+      preLoaderRoute: typeof CitizenNewRouteImport
+      parentRoute: typeof CitizenRoute
+    }
   }
 }
 
+interface CitizenRouteChildren {
+  CitizenNewRoute: typeof CitizenNewRoute
+  CitizenProfileRoute: typeof CitizenProfileRoute
+  CitizenShipmentsRoute: typeof CitizenShipmentsRoute
+  CitizenWalletRoute: typeof CitizenWalletRoute
+  CitizenIndexRoute: typeof CitizenIndexRoute
+}
+
+const CitizenRouteChildren: CitizenRouteChildren = {
+  CitizenNewRoute: CitizenNewRoute,
+  CitizenProfileRoute: CitizenProfileRoute,
+  CitizenShipmentsRoute: CitizenShipmentsRoute,
+  CitizenWalletRoute: CitizenWalletRoute,
+  CitizenIndexRoute: CitizenIndexRoute,
+}
+
+const CitizenRouteWithChildren =
+  CitizenRoute._addFileChildren(CitizenRouteChildren)
+
+interface CompanyRouteChildren {
+  CompanyFeedRoute: typeof CompanyFeedRoute
+  CompanyOrdersRoute: typeof CompanyOrdersRoute
+  CompanyProfileRoute: typeof CompanyProfileRoute
+  CompanyStatsRoute: typeof CompanyStatsRoute
+  CompanyIndexRoute: typeof CompanyIndexRoute
+}
+
+const CompanyRouteChildren: CompanyRouteChildren = {
+  CompanyFeedRoute: CompanyFeedRoute,
+  CompanyOrdersRoute: CompanyOrdersRoute,
+  CompanyProfileRoute: CompanyProfileRoute,
+  CompanyStatsRoute: CompanyStatsRoute,
+  CompanyIndexRoute: CompanyIndexRoute,
+}
+
+const CompanyRouteWithChildren =
+  CompanyRoute._addFileChildren(CompanyRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CitizenRoute: CitizenRouteWithChildren,
+  CompanyRoute: CompanyRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
