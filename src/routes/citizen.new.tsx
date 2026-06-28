@@ -1,7 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { ArrowRight, Home as HomeIcon, Loader2, MapPin, Scale, Send } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
+import { IconBtn } from "@/components/IconBtn";
+import { PhotoCapture } from "@/components/PhotoCapture";
 import { MATERIALS, type MaterialKey } from "@/lib/tadweer-data";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/citizen/new")({
   head: () => ({ meta: [{ title: "وجبة جديدة — تدوير بلو" }] }),
@@ -10,16 +16,39 @@ export const Route = createFileRoute("/citizen/new")({
 
 function NewShipment() {
   const nav = useNavigate();
+  const { user, profile } = useAuth();
   const [material, setMaterial] = useState<MaterialKey>("plastic");
   const [weight, setWeight] = useState("");
-  const [address, setAddress] = useState("الكرادة - قرب جامع بنية");
+  const [area, setArea] = useState("الكرادة - قرب جامع بنية");
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function submit() {
+    if (!user) return;
+    const w = parseFloat(weight);
+    if (!w || w <= 0) return toast.error("ادخل وزن صحيح");
+    setBusy(true);
+    const { error } = await supabase.from("shipments").insert({
+      citizen_id: user.id,
+      material,
+      weight_kg: w,
+      area,
+      city: profile?.city ?? "بغداد",
+      photo_url: photoUrl,
+      status: "pending",
+    });
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("تم نشر وجبتك في منطقتك");
+    nav({ to: "/citizen/shipments" });
+  }
 
   return (
     <>
       <AppHeader
         back={
-          <Link to="/citizen" className="grid h-11 w-11 place-items-center rounded-full bg-surface text-lg shadow-[0_4px_14px_-4px_oklch(0.6_0.15_250/0.25)]">
-            →
+          <Link to="/citizen" aria-label="رجوع">
+            <IconBtn as="span"><ArrowRight size={18} /></IconBtn>
           </Link>
         }
         title="وجبة جديدة"
@@ -27,21 +56,7 @@ function NewShipment() {
         right={<div className="h-11 w-11" />}
       />
 
-      <div className="glass-card relative mt-1 overflow-hidden rounded-3xl">
-        <div
-          className="flex h-48 items-center justify-center bg-gradient-to-br from-[oklch(0.85_0.05_220)] to-[oklch(0.7_0.12_245)] text-white"
-        >
-          <div className="text-center">
-            <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-white/25 text-3xl backdrop-blur">
-              📷
-            </div>
-            <p className="mt-2 text-sm font-bold">اضغط لالتقاط صورة المواد</p>
-          </div>
-        </div>
-        <button className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-primary">
-          إعادة الالتقاط
-        </button>
-      </div>
+      <PhotoCapture bucket="shipment-photos" onUploaded={(_p, url) => setPhotoUrl(url)} initialUrl={photoUrl} />
 
       <section className="mt-6">
         <p className="mb-3 text-xs font-bold text-muted-foreground">نوع المادة</p>
@@ -52,11 +67,11 @@ function NewShipment() {
               <button
                 key={key}
                 onClick={() => setMaterial(key as MaterialKey)}
-                className={`flex flex-col items-center gap-1 rounded-2xl py-3 transition ${
+                className={`flex flex-col items-center gap-1 rounded-2xl py-3 transition active:scale-90 ${
                   active ? "btn-primary-gradient text-white" : "glass-card"
                 }`}
               >
-                <span className="text-2xl">{m.icon}</span>
+                <m.Icon size={22} className={active ? "text-white" : ""} style={!active ? { color: m.color } : undefined} />
                 <span className="text-[10px] font-bold">{m.label}</span>
               </button>
             );
@@ -67,7 +82,7 @@ function NewShipment() {
       <section className="mt-6">
         <label className="mb-2 block text-xs font-bold text-muted-foreground">الوزن التقريبي (كيلو)</label>
         <div className="glass-card flex items-center gap-3 rounded-2xl px-4 py-3">
-          <span className="text-xl">⚖️</span>
+          <Scale size={18} className="text-primary" />
           <input
             inputMode="numeric"
             value={weight}
@@ -84,26 +99,21 @@ function NewShipment() {
         <div className="glass-card overflow-hidden rounded-3xl">
           <div className="relative h-32 bg-[radial-gradient(circle_at_30%_40%,oklch(0.85_0.08_230),oklch(0.95_0.02_230))]">
             <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "linear-gradient(oklch(0.6_0.1_240/.2) 1px,transparent 1px),linear-gradient(90deg,oklch(0.6_0.1_240/.2) 1px,transparent 1px)", backgroundSize: "22px 22px" }} />
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full text-3xl">📍</div>
-            <button className="absolute bottom-2 right-2 rounded-full bg-white/95 px-3 py-1 text-[11px] font-bold text-primary">
-              تحديد على الخريطة
-            </button>
+            <MapPin size={28} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full text-primary" />
           </div>
           <div className="flex items-center gap-2 p-3">
-            <span className="text-lg">🏠</span>
-            <input
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="flex-1 bg-transparent text-sm font-bold outline-none"
-            />
+            <HomeIcon size={18} className="text-muted-foreground" />
+            <input value={area} onChange={(e) => setArea(e.target.value)} className="flex-1 bg-transparent text-sm font-bold outline-none" />
           </div>
         </div>
       </section>
 
       <button
-        onClick={() => nav({ to: "/citizen/shipments" })}
-        className="btn-primary-gradient mt-8 w-full rounded-2xl py-4 text-base font-extrabold"
+        onClick={submit}
+        disabled={busy}
+        className="btn-primary-gradient mt-8 inline-flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-extrabold transition active:scale-[0.98] disabled:opacity-60"
       >
+        {busy ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
         انشر العرض في منطقتي
       </button>
     </>

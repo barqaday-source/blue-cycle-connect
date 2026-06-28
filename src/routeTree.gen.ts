@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as CompanyRouteImport } from './routes/company'
 import { Route as CitizenRouteImport } from './routes/citizen'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CompanyIndexRouteImport } from './routes/company.index'
 import { Route as CitizenIndexRouteImport } from './routes/citizen.index'
@@ -31,6 +32,11 @@ const CompanyRoute = CompanyRouteImport.update({
 const CitizenRoute = CitizenRouteImport.update({
   id: '/citizen',
   path: '/citizen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -91,6 +97,7 @@ const CitizenNewRoute = CitizenNewRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/citizen': typeof CitizenRouteWithChildren
   '/company': typeof CompanyRouteWithChildren
   '/citizen/new': typeof CitizenNewRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/citizen/new': typeof CitizenNewRoute
   '/citizen/profile': typeof CitizenProfileRoute
   '/citizen/shipments': typeof CitizenShipmentsRoute
@@ -120,6 +128,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/citizen': typeof CitizenRouteWithChildren
   '/company': typeof CompanyRouteWithChildren
   '/citizen/new': typeof CitizenNewRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/citizen'
     | '/company'
     | '/citizen/new'
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/citizen/new'
     | '/citizen/profile'
     | '/citizen/shipments'
@@ -165,6 +176,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/auth'
     | '/citizen'
     | '/company'
     | '/citizen/new'
@@ -181,6 +193,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   CitizenRoute: typeof CitizenRouteWithChildren
   CompanyRoute: typeof CompanyRouteWithChildren
 }
@@ -199,6 +212,13 @@ declare module '@tanstack/react-router' {
       path: '/citizen'
       fullPath: '/citizen'
       preLoaderRoute: typeof CitizenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -321,6 +341,7 @@ const CompanyRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   CitizenRoute: CitizenRouteWithChildren,
   CompanyRoute: CompanyRouteWithChildren,
 }
