@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Recycle, Building2, User2, ShieldCheck, LogIn, ChevronLeft } from "lucide-react";
+import { Recycle, Building2, User2, LogIn, ChevronLeft } from "lucide-react";
 import { useAuth, ADMIN_EMAIL } from "@/lib/auth";
 
 export const Route = createFileRoute("/")({
@@ -48,12 +48,6 @@ function Home() {
           icon={<Building2 size={28} className="text-primary" />}
           title="أنا شركة / معمل تدوير"
           subtitle="اعرض الشحنات القريبة على الخريطة."
-        />
-        <RoleCard
-          to="/auth"
-          icon={<ShieldCheck size={28} className="text-primary" />}
-          title="مدير التطبيق"
-          subtitle="لوحة تحكم خاصة بالمدير المعتمد."
         />
       </div>
 
