@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Building2, ChevronLeft, LogOut, MapPin, MessageCircle, Recycle, ShieldCheck, Truck } from "lucide-react";
+import { Building2, ChevronLeft, LogOut, MapPin, MessageCircle, Recycle, Truck } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
-import { useAuth, ADMIN_EMAIL } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/company/profile")({
   head: () => ({ meta: [{ title: "حساب الشركة — تدوير بلو" }] }),
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/company/profile")({
 });
 
 function CompanyProfile() {
-  const { profile, user, signOut, isAdmin } = useAuth();
+  const { profile, user, signOut } = useAuth();
   const nav = useNavigate();
   const items = [
     { Icon: Building2, t: "بيانات المعمل" },
@@ -18,7 +18,6 @@ function CompanyProfile() {
     { Icon: Truck, t: "السائقون والآليات" },
     { Icon: MessageCircle, t: "الدعم الفني (واتساب)" },
   ];
-  const showAdmin = isAdmin || user?.email?.toLowerCase() === ADMIN_EMAIL;
   return (
     <>
       <AppHeader title="حساب الشركة" subtitle="تدوير بلو" />
@@ -40,13 +39,6 @@ function CompanyProfile() {
             <ChevronLeft size={16} className="text-muted-foreground" />
           </button>
         ))}
-        {showAdmin && (
-          <button onClick={() => nav({ to: "/admin" })} className="glass-card flex items-center gap-3 rounded-2xl p-4 text-right transition active:scale-[0.98]">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-warning/15 text-warning"><ShieldCheck size={18} /></span>
-            <span className="min-w-0 flex-1 truncate text-sm font-bold">لوحة المدير</span>
-            <ChevronLeft size={16} className="text-muted-foreground" />
-          </button>
-        )}
       </div>
 
       <button
