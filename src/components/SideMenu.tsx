@@ -52,9 +52,9 @@ export function SideMenu() {
       <SheetTrigger asChild>
         <button
           aria-label="القائمة"
-          className="grid h-11 w-11 place-items-center rounded-full bg-surface text-foreground shadow-[0_4px_14px_-4px_oklch(0.6_0.15_250/0.25)] transition active:scale-90"
+          className="press tap-ring glass grid h-11 w-11 place-items-center rounded-full text-foreground"
         >
-          <Menu size={20} />
+          <Menu size={20} strokeWidth={1.75} />
         </button>
       </SheetTrigger>
       <SheetContent side="right" className="w-[88%] max-w-[340px] p-0">
