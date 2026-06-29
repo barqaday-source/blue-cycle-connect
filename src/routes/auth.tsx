@@ -24,17 +24,19 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   async function sendCode() {
-    if (!email.trim() || !name.trim()) {
-      toast.error("الرجاء إدخال الاسم والإيميل");
-      return;
-    }
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail);
+    if (!cleanName) return toast.error("الرجاء إدخال الاسم الكامل");
+    if (!emailOk) return toast.error("الإيميل غير صحيح — مثال: name@example.com");
+    if (role === "company" && !company.trim()) return toast.error("الرجاء إدخال اسم الشركة");
     setBusy(true);
     const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
+      email: cleanEmail,
       options: {
         shouldCreateUser: true,
         data: {
-          full_name: name.trim(),
+          full_name: cleanName,
           role,
           company_name: role === "company" ? company.trim() : null,
         },
@@ -82,11 +84,11 @@ function AuthPage() {
         <div className="mt-8 flex flex-col gap-3">
           <RoleSeg value={role} onChange={setRole} />
 
-          <Field icon={<User size={18} />} placeholder="الاسم الكامل" value={name} onChange={setName} />
+          <Field label="الاسم الكامل" icon={<User size={18} />} placeholder="مثال: أحمد محمد" value={name} onChange={setName} autoComplete="name" />
           {role === "company" && (
-            <Field icon={<Building2 size={18} />} placeholder="اسم الشركة / المعمل" value={company} onChange={setCompany} />
+            <Field label="اسم الشركة / المعمل" icon={<Building2 size={18} />} placeholder="مثال: شركة تدوير بغداد" value={company} onChange={setCompany} autoComplete="organization" />
           )}
-          <Field icon={<Mail size={18} />} placeholder="الإيميل" value={email} onChange={setEmail} type="email" inputMode="email" />
+          <Field label="البريد الإلكتروني" icon={<Mail size={18} />} placeholder="name@example.com" value={email} onChange={setEmail} type="email" inputMode="email" autoComplete="email" dir="ltr" />
 
           <button
             onClick={sendCode}
@@ -103,7 +105,7 @@ function AuthPage() {
         </div>
       ) : (
         <div className="mt-8 flex flex-col gap-3">
-          <Field icon={<KeyRound size={18} />} placeholder="رمز التحقق (6 أرقام)" value={code} onChange={setCode} inputMode="numeric" />
+          <Field label="رمز التحقق" icon={<KeyRound size={18} />} placeholder="6 أرقام" value={code} onChange={setCode} inputMode="numeric" />
           <button
             onClick={verify}
             disabled={busy}
@@ -127,30 +129,41 @@ function AuthPage() {
 
 function Field({
   icon,
+  label,
   placeholder,
   value,
   onChange,
   type = "text",
   inputMode,
+  autoComplete,
+  dir,
 }: {
   icon: React.ReactNode;
+  label: string;
   placeholder: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
   inputMode?: "text" | "email" | "numeric";
+  autoComplete?: string;
+  dir?: "ltr" | "rtl";
 }) {
   return (
-    <label className="glass-card flex items-center gap-3 rounded-2xl px-4 py-3 transition focus-within:ring-2 focus-within:ring-primary/40">
-      <span className="text-primary">{icon}</span>
-      <input
-        type={type}
-        inputMode={inputMode}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="flex-1 bg-transparent text-base font-bold outline-none placeholder:text-muted-foreground/60"
-      />
+    <label className="glass flex flex-col gap-1 rounded-2xl px-4 py-2.5 transition focus-within:ring-2 focus-within:ring-primary/40">
+      <span className="text-[10px] font-extrabold text-muted-foreground">{label}</span>
+      <div className="flex items-center gap-3">
+        <span className="text-primary">{icon}</span>
+        <input
+          type={type}
+          inputMode={inputMode}
+          autoComplete={autoComplete}
+          dir={dir}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="flex-1 bg-transparent text-base font-bold outline-none placeholder:text-muted-foreground/50"
+        />
+      </div>
     </label>
   );
 }
