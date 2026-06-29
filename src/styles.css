@@ -86,6 +86,9 @@
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
   }
+  /* Unified modern thin stroke for all Lucide icons */
+  svg.lucide { stroke-width: 1.75; }
+  button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 @utility glass-card {
