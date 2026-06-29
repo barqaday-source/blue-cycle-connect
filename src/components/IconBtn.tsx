@@ -3,19 +3,21 @@ import { cn } from "@/lib/utils";
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  variant?: "soft" | "ghost" | "solid";
+  variant?: "glass" | "ghost" | "solid";
+  size?: "sm" | "md" | "lg";
 }
 
-/** Unified icon button with press animation used across the whole app. */
-export function IconBtn({ children, className, variant = "soft", ...rest }: Props) {
+/** Unified glass icon button with smooth press animation used across the app. */
+export function IconBtn({ children, className, variant = "glass", size = "md", ...rest }: Props) {
+  const sz = size === "sm" ? "h-9 w-9" : size === "lg" ? "h-12 w-12" : "h-11 w-11";
   return (
     <button
       {...rest}
       className={cn(
-        "grid h-11 w-11 place-items-center rounded-full transition-all duration-150 active:scale-90 active:rotate-[-4deg]",
-        variant === "soft" &&
-          "bg-surface text-foreground shadow-[0_4px_14px_-4px_oklch(0.6_0.15_250/0.25)] hover:bg-primary-soft",
-        variant === "ghost" && "text-muted-foreground hover:bg-primary-soft hover:text-primary",
+        "press tap-ring grid place-items-center rounded-full",
+        sz,
+        variant === "glass" && "glass text-foreground hover:text-primary",
+        variant === "ghost" && "text-muted-foreground hover:bg-primary-soft hover:text-primary transition-colors",
         variant === "solid" && "btn-primary-gradient text-white",
         className,
       )}
