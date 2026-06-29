@@ -105,7 +105,7 @@ function AuthPage() {
         </div>
       ) : (
         <div className="mt-8 flex flex-col gap-3">
-          <Field icon={<KeyRound size={18} />} placeholder="رمز التحقق (6 أرقام)" value={code} onChange={setCode} inputMode="numeric" />
+          <Field label="رمز التحقق" icon={<KeyRound size={18} />} placeholder="6 أرقام" value={code} onChange={setCode} inputMode="numeric" />
           <button
             onClick={verify}
             disabled={busy}
