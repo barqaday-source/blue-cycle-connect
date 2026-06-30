@@ -61,6 +61,11 @@ function Home() {
       <p className="mt-auto pt-10 text-center text-[11px] text-muted-foreground">
         بالمتابعة فأنت توافق على الشروط وسياسة الخصوصية
       </p>
+
+      <div className="mt-4 flex items-center justify-center gap-1.5 font-buster text-[13px] text-indigo-brand/80" dir="ltr">
+        <span>from</span>
+        <span className="text-indigo-brand">BLUE</span>
+      </div>
     </main>
   );
 }
