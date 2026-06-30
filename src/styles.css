@@ -147,3 +147,12 @@
 }
 @utility float-in { animation: float-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
+@utility font-buster {
+  font-family: "Bowlby One", "Tan Buster", "Tajawal", system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  font-weight: 400;
+}
+
+.text-indigo-brand { color: #1a237e; }
+
+
