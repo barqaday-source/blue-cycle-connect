@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Recycle, Mail, User, KeyRound, Building2, ChevronLeft, Loader2 } from "lucide-react";
+import { Recycle, Mail, User, Building2, LogIn, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth, ADMIN_EMAIL } from "@/lib/auth";
@@ -12,57 +12,73 @@ export const Route = createFileRoute("/auth")({
 
 type RoleChoice = "citizen" | "company";
 
+// Deterministic password derived from email so users only need their email.
+function derivePassword(email: string) {
+  // simple, stable, opaque — not a security boundary (project is OTP-less by design)
+  const base = `tadweer-blue::${email.toLowerCase().trim()}::v1`;
+  let h = 0;
+  for (let i = 0; i < base.length; i++) h = (h * 31 + base.charCodeAt(i)) | 0;
+  return `Tb!${btoa(base).replace(/=/g, "")}${Math.abs(h)}`;
+}
+
 function AuthPage() {
   const nav = useNavigate();
   const { refresh } = useAuth();
-  const [step, setStep] = useState<"info" | "code">("info");
   const [role, setRole] = useState<RoleChoice>("citizen");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
-  const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
 
-  async function sendCode() {
+  async function loginOrSignup() {
     const cleanName = name.trim();
     const cleanEmail = email.trim().toLowerCase();
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail);
     if (!cleanName) return toast.error("الرجاء إدخال الاسم الكامل");
     if (!emailOk) return toast.error("الإيميل غير صحيح — مثال: name@example.com");
     if (role === "company" && !company.trim()) return toast.error("الرجاء إدخال اسم الشركة");
-    setBusy(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email: cleanEmail,
-      options: {
-        shouldCreateUser: true,
-        data: {
-          full_name: cleanName,
-          role,
-          company_name: role === "company" ? company.trim() : null,
-        },
-      },
-    });
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    toast.success("تم إرسال رمز الدخول إلى إيميلك");
-    setStep("code");
-  }
 
-  async function verify() {
-    if (code.length < 6) return toast.error("ادخل الرمز المكوّن من 6 أرقام");
     setBusy(true);
-    const { data, error } = await supabase.auth.verifyOtp({
-      email: email.trim(),
-      token: code.trim(),
-      type: "email",
-    });
+    const password = derivePassword(cleanEmail);
+
+    // Try sign-in first (returning user)
+    let { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+
+    if (error) {
+      // New user — sign up
+      const signup = await supabase.auth.signUp({
+        email: cleanEmail,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            full_name: cleanName,
+            role,
+            company_name: role === "company" ? company.trim() : null,
+          },
+        },
+      });
+      if (signup.error) {
+        setBusy(false);
+        return toast.error(signup.error.message);
+      }
+      data = signup.data as typeof data;
+      // In case session isn't returned immediately, sign in again
+      if (!data.session) {
+        const retry = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+        if (retry.error) {
+          setBusy(false);
+          return toast.error(retry.error.message);
+        }
+        data = retry.data;
+      }
+    }
+
     setBusy(false);
-    if (error) return toast.error(error.message);
-    if (data.session) {
+    if (data?.session) {
       await refresh();
-      toast.success("تم الدخول بنجاح");
-      // Route by role/email
-      if (email.trim().toLowerCase() === ADMIN_EMAIL) nav({ to: "/admin" });
+      toast.success("أهلاً بك في تدوير بلو");
+      if (cleanEmail === ADMIN_EMAIL) nav({ to: "/admin" });
       else if (role === "company") nav({ to: "/company" });
       else nav({ to: "/citizen" });
     }
@@ -76,49 +92,32 @@ function AuthPage() {
         </div>
         <h1 className="text-2xl font-black">تدوير بلو</h1>
         <p className="text-center text-sm text-muted-foreground">
-          {step === "info" ? "أهلاً بك — سجّل بإيميلك بخطوة واحدة" : `أدخل الرمز المرسل إلى ${email}`}
+          أهلاً بك — سجّل بإيميلك بنقرة واحدة
         </p>
       </div>
 
-      {step === "info" ? (
-        <div className="mt-8 flex flex-col gap-3">
-          <RoleSeg value={role} onChange={setRole} />
+      <div className="mt-8 flex flex-col gap-3">
+        <RoleSeg value={role} onChange={setRole} />
 
-          <Field label="الاسم الكامل" icon={<User size={18} />} placeholder="مثال: أحمد محمد" value={name} onChange={setName} autoComplete="name" />
-          {role === "company" && (
-            <Field label="اسم الشركة / المعمل" icon={<Building2 size={18} />} placeholder="مثال: شركة تدوير بغداد" value={company} onChange={setCompany} autoComplete="organization" />
-          )}
-          <Field label="البريد الإلكتروني" icon={<Mail size={18} />} placeholder="name@example.com" value={email} onChange={setEmail} type="email" inputMode="email" autoComplete="email" dir="ltr" />
+        <Field label="الاسم الكامل" icon={<User size={18} />} placeholder="مثال: أحمد محمد" value={name} onChange={setName} autoComplete="name" />
+        {role === "company" && (
+          <Field label="اسم الشركة / المعمل" icon={<Building2 size={18} />} placeholder="مثال: شركة تدوير بغداد" value={company} onChange={setCompany} autoComplete="organization" />
+        )}
+        <Field label="البريد الإلكتروني" icon={<Mail size={18} />} placeholder="name@example.com" value={email} onChange={setEmail} type="email" inputMode="email" autoComplete="email" dir="ltr" />
 
-          <button
-            onClick={sendCode}
-            disabled={busy}
-            className="btn-primary-gradient mt-2 inline-flex items-center justify-center gap-2 rounded-2xl py-4 text-base font-extrabold transition active:scale-[0.98] disabled:opacity-60"
-          >
-            {busy ? <Loader2 className="animate-spin" size={18} /> : <ChevronLeft size={18} />}
-            إرسال رمز الدخول
-          </button>
+        <button
+          onClick={loginOrSignup}
+          disabled={busy}
+          className="btn-primary-gradient press tap-ring mt-2 inline-flex items-center justify-center gap-2 rounded-2xl py-4 text-base font-extrabold disabled:opacity-60"
+        >
+          {busy ? <Loader2 className="animate-spin" size={18} /> : <LogIn size={18} />}
+          تسجيل الدخول / إنشاء حساب
+        </button>
 
-          <p className="mt-2 text-center text-[11px] text-muted-foreground">
-            سيصلك رمز مكوّن من 6 أرقام على إيميلك — مجاناً وبدون كلمة سر.
-          </p>
-        </div>
-      ) : (
-        <div className="mt-8 flex flex-col gap-3">
-          <Field label="رمز التحقق" icon={<KeyRound size={18} />} placeholder="6 أرقام" value={code} onChange={setCode} inputMode="numeric" />
-          <button
-            onClick={verify}
-            disabled={busy}
-            className="btn-primary-gradient inline-flex items-center justify-center gap-2 rounded-2xl py-4 text-base font-extrabold active:scale-[0.98] disabled:opacity-60"
-          >
-            {busy ? <Loader2 className="animate-spin" size={18} /> : null}
-            تأكيد ودخول
-          </button>
-          <button onClick={() => setStep("info")} className="text-xs font-bold text-primary">
-            تعديل الإيميل / إعادة الإرسال
-          </button>
-        </div>
-      )}
+        <p className="mt-2 text-center text-[11px] text-muted-foreground">
+          دخول فوري بدون رمز تحقق — فقط إيميلك واسمك.
+        </p>
+      </div>
 
       <Link to="/" className="mt-auto pt-6 text-center text-[12px] text-muted-foreground">
         العودة للصفحة الرئيسية
