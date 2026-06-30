@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Recycle, Mail, User, KeyRound, Building2, ChevronLeft, Loader2 } from "lucide-react";
+import { Recycle, Mail, User, Building2, LogIn, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth, ADMIN_EMAIL } from "@/lib/auth";
@@ -12,57 +12,73 @@ export const Route = createFileRoute("/auth")({
 
 type RoleChoice = "citizen" | "company";
 
+// Deterministic password derived from email so users only need their email.
+function derivePassword(email: string) {
+  // simple, stable, opaque — not a security boundary (project is OTP-less by design)
+  const base = `tadweer-blue::${email.toLowerCase().trim()}::v1`;
+  let h = 0;
+  for (let i = 0; i < base.length; i++) h = (h * 31 + base.charCodeAt(i)) | 0;
+  return `Tb!${btoa(base).replace(/=/g, "")}${Math.abs(h)}`;
+}
+
 function AuthPage() {
   const nav = useNavigate();
   const { refresh } = useAuth();
-  const [step, setStep] = useState<"info" | "code">("info");
   const [role, setRole] = useState<RoleChoice>("citizen");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
-  const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
 
-  async function sendCode() {
+  async function loginOrSignup() {
     const cleanName = name.trim();
     const cleanEmail = email.trim().toLowerCase();
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail);
     if (!cleanName) return toast.error("الرجاء إدخال الاسم الكامل");
     if (!emailOk) return toast.error("الإيميل غير صحيح — مثال: name@example.com");
     if (role === "company" && !company.trim()) return toast.error("الرجاء إدخال اسم الشركة");
-    setBusy(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email: cleanEmail,
-      options: {
-        shouldCreateUser: true,
-        data: {
-          full_name: cleanName,
-          role,
-          company_name: role === "company" ? company.trim() : null,
-        },
-      },
-    });
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    toast.success("تم إرسال رمز الدخول إلى إيميلك");
-    setStep("code");
-  }
 
-  async function verify() {
-    if (code.length < 6) return toast.error("ادخل الرمز المكوّن من 6 أرقام");
     setBusy(true);
-    const { data, error } = await supabase.auth.verifyOtp({
-      email: email.trim(),
-      token: code.trim(),
-      type: "email",
-    });
+    const password = derivePassword(cleanEmail);
+
+    // Try sign-in first (returning user)
+    let { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+
+    if (error) {
+      // New user — sign up
+      const signup = await supabase.auth.signUp({
+        email: cleanEmail,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            full_name: cleanName,
+            role,
+            company_name: role === "company" ? company.trim() : null,
+          },
+        },
+      });
+      if (signup.error) {
+        setBusy(false);
+        return toast.error(signup.error.message);
+      }
+      data = signup.data as typeof data;
+      // In case session isn't returned immediately, sign in again
+      if (!data.session) {
+        const retry = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+        if (retry.error) {
+          setBusy(false);
+          return toast.error(retry.error.message);
+        }
+        data = retry.data;
+      }
+    }
+
     setBusy(false);
-    if (error) return toast.error(error.message);
-    if (data.session) {
+    if (data?.session) {
       await refresh();
-      toast.success("تم الدخول بنجاح");
-      // Route by role/email
-      if (email.trim().toLowerCase() === ADMIN_EMAIL) nav({ to: "/admin" });
+      toast.success("أهلاً بك في تدوير بلو");
+      if (cleanEmail === ADMIN_EMAIL) nav({ to: "/admin" });
       else if (role === "company") nav({ to: "/company" });
       else nav({ to: "/citizen" });
     }
