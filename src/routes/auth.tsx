@@ -92,49 +92,32 @@ function AuthPage() {
         </div>
         <h1 className="text-2xl font-black">تدوير بلو</h1>
         <p className="text-center text-sm text-muted-foreground">
-          {step === "info" ? "أهلاً بك — سجّل بإيميلك بخطوة واحدة" : `أدخل الرمز المرسل إلى ${email}`}
+          أهلاً بك — سجّل بإيميلك بنقرة واحدة
         </p>
       </div>
 
-      {step === "info" ? (
-        <div className="mt-8 flex flex-col gap-3">
-          <RoleSeg value={role} onChange={setRole} />
+      <div className="mt-8 flex flex-col gap-3">
+        <RoleSeg value={role} onChange={setRole} />
 
-          <Field label="الاسم الكامل" icon={<User size={18} />} placeholder="مثال: أحمد محمد" value={name} onChange={setName} autoComplete="name" />
-          {role === "company" && (
-            <Field label="اسم الشركة / المعمل" icon={<Building2 size={18} />} placeholder="مثال: شركة تدوير بغداد" value={company} onChange={setCompany} autoComplete="organization" />
-          )}
-          <Field label="البريد الإلكتروني" icon={<Mail size={18} />} placeholder="name@example.com" value={email} onChange={setEmail} type="email" inputMode="email" autoComplete="email" dir="ltr" />
+        <Field label="الاسم الكامل" icon={<User size={18} />} placeholder="مثال: أحمد محمد" value={name} onChange={setName} autoComplete="name" />
+        {role === "company" && (
+          <Field label="اسم الشركة / المعمل" icon={<Building2 size={18} />} placeholder="مثال: شركة تدوير بغداد" value={company} onChange={setCompany} autoComplete="organization" />
+        )}
+        <Field label="البريد الإلكتروني" icon={<Mail size={18} />} placeholder="name@example.com" value={email} onChange={setEmail} type="email" inputMode="email" autoComplete="email" dir="ltr" />
 
-          <button
-            onClick={sendCode}
-            disabled={busy}
-            className="btn-primary-gradient mt-2 inline-flex items-center justify-center gap-2 rounded-2xl py-4 text-base font-extrabold transition active:scale-[0.98] disabled:opacity-60"
-          >
-            {busy ? <Loader2 className="animate-spin" size={18} /> : <ChevronLeft size={18} />}
-            إرسال رمز الدخول
-          </button>
+        <button
+          onClick={loginOrSignup}
+          disabled={busy}
+          className="btn-primary-gradient press tap-ring mt-2 inline-flex items-center justify-center gap-2 rounded-2xl py-4 text-base font-extrabold disabled:opacity-60"
+        >
+          {busy ? <Loader2 className="animate-spin" size={18} /> : <LogIn size={18} />}
+          تسجيل الدخول / إنشاء حساب
+        </button>
 
-          <p className="mt-2 text-center text-[11px] text-muted-foreground">
-            سيصلك رمز مكوّن من 6 أرقام على إيميلك — مجاناً وبدون كلمة سر.
-          </p>
-        </div>
-      ) : (
-        <div className="mt-8 flex flex-col gap-3">
-          <Field label="رمز التحقق" icon={<KeyRound size={18} />} placeholder="6 أرقام" value={code} onChange={setCode} inputMode="numeric" />
-          <button
-            onClick={verify}
-            disabled={busy}
-            className="btn-primary-gradient inline-flex items-center justify-center gap-2 rounded-2xl py-4 text-base font-extrabold active:scale-[0.98] disabled:opacity-60"
-          >
-            {busy ? <Loader2 className="animate-spin" size={18} /> : null}
-            تأكيد ودخول
-          </button>
-          <button onClick={() => setStep("info")} className="text-xs font-bold text-primary">
-            تعديل الإيميل / إعادة الإرسال
-          </button>
-        </div>
-      )}
+        <p className="mt-2 text-center text-[11px] text-muted-foreground">
+          دخول فوري بدون رمز تحقق — فقط إيميلك واسمك.
+        </p>
+      </div>
 
       <Link to="/" className="mt-auto pt-6 text-center text-[12px] text-muted-foreground">
         العودة للصفحة الرئيسية
