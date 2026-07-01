@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Camera, ChevronLeft, MapPin, Megaphone } from "lucide-react";
+import { Bell, Camera, ChevronLeft, MapPin, Megaphone, TrendingUp } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { IconBtn } from "@/components/IconBtn";
 import { MATERIALS, statusMeta, timeAgo, type ShipmentRow } from "@/lib/tadweer-data";
@@ -73,6 +73,20 @@ function CitizenHome() {
         </div>
         <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white/20"><ChevronLeft size={26} /></div>
       </Link>
+      <Link
+        to="/prices"
+        className="glass-card mt-3 flex items-center gap-3 rounded-2xl p-3 press"
+      >
+        <div className="grid h-11 w-11 place-items-center rounded-2xl bg-success/15 text-success">
+          <TrendingUp size={20} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-extrabold">أسعار اليوم</p>
+          <p className="text-[11px] text-muted-foreground">شوف سعر الكيلو لكل مادة قبل ما تبيع</p>
+        </div>
+        <ChevronLeft size={18} className="text-primary" />
+      </Link>
+
 
       <section className="mt-8">
         <p className="mb-3 text-xs font-bold text-muted-foreground">اختر نوع المادة بسرعة</p>
