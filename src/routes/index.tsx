@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Recycle, Building2, User2, LogIn, ChevronLeft } from "lucide-react";
 import { useAuth, ADMIN_EMAIL } from "@/lib/auth";
 
@@ -13,16 +13,45 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+function Splash() {
+  return (
+    <main className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--gradient-sky)] px-6">
+      <div className="btn-primary-gradient float-in grid h-28 w-28 place-items-center rounded-[2rem]">
+        <Recycle size={54} className="text-white" />
+      </div>
+      <h1 className="float-in mt-6 text-3xl font-black tracking-tight">تدوير بلو</h1>
+      <p className="float-in mt-2 text-center text-sm text-muted-foreground">
+        نظّف مدينتك — اكسب من مواردك
+      </p>
+      <div
+        className="absolute bottom-8 flex items-center justify-center gap-1.5 font-buster text-[15px] text-indigo-brand"
+        dir="ltr"
+      >
+        <span className="opacity-70">from</span>
+        <span>BLUE</span>
+      </div>
+    </main>
+  );
+}
+
 function Home() {
   const { user, isAdmin, isCompany, loading } = useAuth();
   const nav = useNavigate();
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
-    if (loading || !user) return;
+    const t = setTimeout(() => setShowSplash(false), 3000);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (loading || !user || showSplash) return;
     if (isAdmin || user.email?.toLowerCase() === ADMIN_EMAIL) nav({ to: "/admin" });
     else if (isCompany) nav({ to: "/company" });
     else nav({ to: "/citizen" });
-  }, [loading, user, isAdmin, isCompany, nav]);
+  }, [loading, user, isAdmin, isCompany, nav, showSplash]);
+
+  if (showSplash) return <Splash />;
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-[460px] flex-col px-6 pb-10 pt-12">
@@ -53,7 +82,7 @@ function Home() {
 
       <Link
         to="/auth"
-        className="btn-primary-gradient mt-8 inline-flex items-center justify-center gap-2 rounded-2xl py-4 text-base font-extrabold active:scale-[0.98]"
+        className="btn-primary-gradient mt-8 inline-flex h-[56px] items-center justify-center gap-2 rounded-2xl text-base font-extrabold active:scale-[0.98]"
       >
         <LogIn size={18} /> ابدأ — تسجيل الدخول
       </Link>
@@ -61,11 +90,6 @@ function Home() {
       <p className="mt-auto pt-10 text-center text-[11px] text-muted-foreground">
         بالمتابعة فأنت توافق على الشروط وسياسة الخصوصية
       </p>
-
-      <div className="mt-4 flex items-center justify-center gap-1.5 font-buster text-[13px] text-indigo-brand/80" dir="ltr">
-        <span>from</span>
-        <span className="text-indigo-brand">BLUE</span>
-      </div>
     </main>
   );
 }
