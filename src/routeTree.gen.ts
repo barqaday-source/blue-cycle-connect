@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PricesRouteImport } from './routes/prices'
 import { Route as CompanyRouteImport } from './routes/company'
 import { Route as CitizenRouteImport } from './routes/citizen'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -26,6 +27,11 @@ import { Route as CitizenShipmentsRouteImport } from './routes/citizen.shipments
 import { Route as CitizenProfileRouteImport } from './routes/citizen.profile'
 import { Route as CitizenNewRouteImport } from './routes/citizen.new'
 
+const PricesRoute = PricesRouteImport.update({
+  id: '/prices',
+  path: '/prices',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CompanyRoute = CompanyRouteImport.update({
   id: '/company',
   path: '/company',
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/citizen': typeof CitizenRouteWithChildren
   '/company': typeof CompanyRouteWithChildren
+  '/prices': typeof PricesRoute
   '/citizen/new': typeof CitizenNewRoute
   '/citizen/profile': typeof CitizenProfileRoute
   '/citizen/shipments': typeof CitizenShipmentsRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/prices': typeof PricesRoute
   '/citizen/new': typeof CitizenNewRoute
   '/citizen/profile': typeof CitizenProfileRoute
   '/citizen/shipments': typeof CitizenShipmentsRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/citizen': typeof CitizenRouteWithChildren
   '/company': typeof CompanyRouteWithChildren
+  '/prices': typeof PricesRoute
   '/citizen/new': typeof CitizenNewRoute
   '/citizen/profile': typeof CitizenProfileRoute
   '/citizen/shipments': typeof CitizenShipmentsRoute
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/citizen'
     | '/company'
+    | '/prices'
     | '/citizen/new'
     | '/citizen/profile'
     | '/citizen/shipments'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/prices'
     | '/citizen/new'
     | '/citizen/profile'
     | '/citizen/shipments'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/citizen'
     | '/company'
+    | '/prices'
     | '/citizen/new'
     | '/citizen/profile'
     | '/citizen/shipments'
@@ -221,10 +233,18 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CitizenRoute: typeof CitizenRouteWithChildren
   CompanyRoute: typeof CompanyRouteWithChildren
+  PricesRoute: typeof PricesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/prices': {
+      id: '/prices'
+      path: '/prices'
+      fullPath: '/prices'
+      preLoaderRoute: typeof PricesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/company': {
       id: '/company'
       path: '/company'
@@ -386,6 +406,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CitizenRoute: CitizenRouteWithChildren,
   CompanyRoute: CompanyRouteWithChildren,
+  PricesRoute: PricesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
