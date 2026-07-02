@@ -114,6 +114,14 @@ function NewAdSheet({ onClose, onSaved }: { onClose: () => void; onSaved: () => 
     if (!user) return;
     if (!title.trim()) return toast.error("ادخل عنوان الإعلان");
     setBusy(true);
+    const coords = await new Promise<{ lat: number; lng: number } | null>((resolve) => {
+      if (!navigator.geolocation) return resolve(null);
+      navigator.geolocation.getCurrentPosition(
+        (p) => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
+        () => resolve(null),
+        { enableHighAccuracy: true, timeout: 6000 },
+      );
+    });
     const { error } = await supabase.from("company_ads").insert({
       company_id: user.id,
       title: title.trim(),
@@ -122,6 +130,8 @@ function NewAdSheet({ onClose, onSaved }: { onClose: () => void; onSaved: () => 
       material: mat,
       image_url: img,
       active: true,
+      lat: coords?.lat ?? null,
+      lng: coords?.lng ?? null,
     });
     setBusy(false);
     if (error) return toast.error(error.message);
