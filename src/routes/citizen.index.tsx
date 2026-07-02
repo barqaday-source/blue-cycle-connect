@@ -86,6 +86,17 @@ function CitizenHome() {
         </div>
         <ChevronLeft size={18} className="text-primary" />
       </Link>
+      <Link to="/map" className="glass-card mt-3 flex items-center gap-3 rounded-2xl p-3 press">
+        <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/10 text-primary">
+          <MapIcon size={20} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-extrabold">الخريطة</p>
+          <p className="text-[11px] text-muted-foreground">شوف المواطنين والشركات القريبة منك</p>
+        </div>
+        <ChevronLeft size={18} className="text-primary" />
+      </Link>
+
 
 
       <section className="mt-8">
