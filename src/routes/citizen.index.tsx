@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Camera, ChevronLeft, MapPin, Megaphone, TrendingUp } from "lucide-react";
+import { Bell, Camera, ChevronLeft, Map as MapIcon, MapPin, Megaphone, TrendingUp } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { IconBtn } from "@/components/IconBtn";
 import { MATERIALS, statusMeta, timeAgo, type ShipmentRow } from "@/lib/tadweer-data";
