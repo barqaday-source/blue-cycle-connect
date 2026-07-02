@@ -21,7 +21,7 @@ function CompanyLayout() {
       <Outlet />
       <BottomNav
         activePath={pathname}
-        centerAction={{ to: "/company", icon: <Map size={26} />, label: "الخريطة" }}
+        centerAction={{ to: "/map", icon: <Map size={26} />, label: "الخريطة" }}
         items={[
           { to: "/company/feed", label: "الشحنات", icon: <ClipboardList size={20} /> },
           { to: "/company/ads", label: "إعلاناتي", icon: <Megaphone size={20} /> },

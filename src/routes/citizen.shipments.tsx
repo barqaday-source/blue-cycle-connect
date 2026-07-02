@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { MapPin, MessageCircle, Phone } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { MapPin, MessageCircle, Phone, Trash2 } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { MATERIALS, statusMeta, timeAgo, type ShipmentRow } from "@/lib/tadweer-data";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/citizen/shipments")({
   head: () => ({ meta: [{ title: "شحناتي — تدوير بلو" }] }),
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/citizen/shipments")({
 
 function MyShipments() {
   const { user } = useAuth();
+  const qc = useQueryClient();
   const q = useQuery({
     queryKey: ["all-my-shipments", user?.id],
     enabled: !!user,
@@ -21,6 +23,14 @@ function MyShipments() {
       return (data ?? []) as ShipmentRow[];
     },
   });
+
+  async function remove(id: string) {
+    if (!confirm("حذف هذه الشحنة؟")) return;
+    const { error } = await supabase.from("shipments").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("تم الحذف");
+    qc.invalidateQueries({ queryKey: ["all-my-shipments"] });
+  }
 
   return (
     <>
@@ -47,12 +57,19 @@ function MyShipments() {
                   <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} /> {meta.label}
                 </span>
               </div>
-              {s.company_id && (
-                <div className="mt-3 grid grid-cols-2 gap-2 border-t border-border pt-3">
-                  <button className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-success/15 py-2 text-xs font-bold text-success active:scale-95"><MessageCircle size={14} /> واتساب</button>
-                  <button className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary/10 py-2 text-xs font-bold text-primary active:scale-95"><Phone size={14} /> اتصال</button>
-                </div>
-              )}
+              <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border pt-3">
+                {s.company_id ? (
+                  <>
+                    <button className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-success/15 py-2 text-xs font-bold text-success active:scale-95"><MessageCircle size={14} /> واتساب</button>
+                    <button className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary/10 py-2 text-xs font-bold text-primary active:scale-95"><Phone size={14} /> اتصال</button>
+                  </>
+                ) : (
+                  <div className="col-span-2 text-center text-[11px] font-bold text-muted-foreground self-center">بانتظار شركة</div>
+                )}
+                <button onClick={() => remove(s.id)} className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-destructive/10 py-2 text-xs font-bold text-destructive active:scale-95">
+                  <Trash2 size={14} /> حذف
+                </button>
+              </div>
             </div>
           );
         })}
@@ -60,3 +77,4 @@ function MyShipments() {
     </>
   );
 }
+

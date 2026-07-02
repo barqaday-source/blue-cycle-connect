@@ -23,6 +23,8 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          lat: number | null
+          lng: number | null
           material: string | null
           price_per_kg: number | null
           title: string
@@ -35,6 +37,8 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          lat?: number | null
+          lng?: number | null
           material?: string | null
           price_per_kg?: number | null
           title: string
@@ -47,6 +51,8 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          lat?: number | null
+          lng?: number | null
           material?: string | null
           price_per_kg?: number | null
           title?: string
@@ -62,6 +68,8 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          lat: number | null
+          lng: number | null
           phone: string | null
           updated_at: string
         }
@@ -73,6 +81,8 @@ export type Database = {
           email?: string | null
           full_name?: string
           id: string
+          lat?: number | null
+          lng?: number | null
           phone?: string | null
           updated_at?: string
         }
@@ -84,6 +94,8 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          lat?: number | null
+          lng?: number | null
           phone?: string | null
           updated_at?: string
         }
@@ -97,6 +109,8 @@ export type Database = {
           company_id: string | null
           created_at: string
           id: string
+          lat: number | null
+          lng: number | null
           material: string
           photo_url: string | null
           status: string
@@ -110,6 +124,8 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           id?: string
+          lat?: number | null
+          lng?: number | null
           material: string
           photo_url?: string | null
           status?: string
@@ -123,6 +139,8 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           id?: string
+          lat?: number | null
+          lng?: number | null
           material?: string
           photo_url?: string | null
           status?: string

@@ -21,7 +21,20 @@ function NewShipment() {
   const [weight, setWeight] = useState("");
   const [area, setArea] = useState("الكرادة - قرب جامع بنية");
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [busy, setBusy] = useState(false);
+
+  function captureLocation() {
+    if (!navigator.geolocation) return toast.error("خدمة الموقع غير متاحة");
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        setCoords({ lat: p.coords.latitude, lng: p.coords.longitude });
+        toast.success("تم تحديد موقعك");
+      },
+      () => toast.error("تعذّر الوصول للموقع"),
+      { enableHighAccuracy: true, timeout: 8000 },
+    );
+  }
 
   async function submit() {
     if (!user) return;
@@ -36,6 +49,8 @@ function NewShipment() {
       city: profile?.city ?? "بغداد",
       photo_url: photoUrl,
       status: "pending",
+      lat: coords?.lat ?? null,
+      lng: coords?.lng ?? null,
     });
     setBusy(false);
     if (error) return toast.error(error.message);
@@ -106,6 +121,12 @@ function NewShipment() {
             <input value={area} onChange={(e) => setArea(e.target.value)} className="flex-1 bg-transparent text-sm font-bold outline-none" />
           </div>
         </div>
+        <button
+          onClick={captureLocation}
+          className={`mt-2 inline-flex w-full items-center justify-center gap-2 rounded-2xl py-2.5 text-xs font-extrabold transition active:scale-[0.98] ${coords ? "bg-success/15 text-success" : "bg-primary/10 text-primary"}`}
+        >
+          <MapPin size={14} /> {coords ? `تم التقاط الإحداثيات (${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)})` : "تحديد موقعي الآن"}
+        </button>
       </section>
 
       <button
