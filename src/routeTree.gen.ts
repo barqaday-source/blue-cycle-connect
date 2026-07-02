@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PricesRouteImport } from './routes/prices'
+import { Route as MapRouteImport } from './routes/map'
 import { Route as CompanyRouteImport } from './routes/company'
 import { Route as CitizenRouteImport } from './routes/citizen'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -30,6 +31,11 @@ import { Route as CitizenNewRouteImport } from './routes/citizen.new'
 const PricesRoute = PricesRouteImport.update({
   id: '/prices',
   path: '/prices',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapRoute = MapRouteImport.update({
+  id: '/map',
+  path: '/map',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompanyRoute = CompanyRouteImport.update({
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/citizen': typeof CitizenRouteWithChildren
   '/company': typeof CompanyRouteWithChildren
+  '/map': typeof MapRoute
   '/prices': typeof PricesRoute
   '/citizen/new': typeof CitizenNewRoute
   '/citizen/profile': typeof CitizenProfileRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/map': typeof MapRoute
   '/prices': typeof PricesRoute
   '/citizen/new': typeof CitizenNewRoute
   '/citizen/profile': typeof CitizenProfileRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/citizen': typeof CitizenRouteWithChildren
   '/company': typeof CompanyRouteWithChildren
+  '/map': typeof MapRoute
   '/prices': typeof PricesRoute
   '/citizen/new': typeof CitizenNewRoute
   '/citizen/profile': typeof CitizenProfileRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/citizen'
     | '/company'
+    | '/map'
     | '/prices'
     | '/citizen/new'
     | '/citizen/profile'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/map'
     | '/prices'
     | '/citizen/new'
     | '/citizen/profile'
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/citizen'
     | '/company'
+    | '/map'
     | '/prices'
     | '/citizen/new'
     | '/citizen/profile'
@@ -233,6 +245,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CitizenRoute: typeof CitizenRouteWithChildren
   CompanyRoute: typeof CompanyRouteWithChildren
+  MapRoute: typeof MapRoute
   PricesRoute: typeof PricesRoute
 }
 
@@ -243,6 +256,13 @@ declare module '@tanstack/react-router' {
       path: '/prices'
       fullPath: '/prices'
       preLoaderRoute: typeof PricesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/map': {
+      id: '/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof MapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/company': {
@@ -406,6 +426,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CitizenRoute: CitizenRouteWithChildren,
   CompanyRoute: CompanyRouteWithChildren,
+  MapRoute: MapRoute,
   PricesRoute: PricesRoute,
 }
 export const routeTree = rootRouteImport
