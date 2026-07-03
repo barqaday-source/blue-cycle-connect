@@ -82,8 +82,16 @@ function MyShipments() {
               <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border pt-3">
                 {s.company_id ? (
                   <>
-                    <button className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-success/15 py-2 text-xs font-bold text-success active:scale-95"><MessageCircle size={14} /> واتساب</button>
-                    <button className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary/10 py-2 text-xs font-bold text-primary active:scale-95"><Phone size={14} /> اتصال</button>
+                    {waHref(s.company_phone, `شركة ${s.company_label ?? ""} — بخصوص شحنة ${m.label} (${s.weight_kg} كغ)`) ? (
+                      <a href={waHref(s.company_phone, `شركة ${s.company_label ?? ""} — بخصوص شحنة ${m.label} (${s.weight_kg} كغ)`)!} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-success/15 py-2 text-xs font-bold text-success active:scale-95"><MessageCircle size={14} /> واتساب</a>
+                    ) : (
+                      <button disabled className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-muted py-2 text-xs font-bold text-muted-foreground"><MessageCircle size={14} /> واتساب</button>
+                    )}
+                    {telHref(s.company_phone) ? (
+                      <a href={telHref(s.company_phone)!} className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary/10 py-2 text-xs font-bold text-primary active:scale-95"><Phone size={14} /> اتصال</a>
+                    ) : (
+                      <button disabled className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-muted py-2 text-xs font-bold text-muted-foreground"><Phone size={14} /> اتصال</button>
+                    )}
                   </>
                 ) : (
                   <div className="col-span-2 text-center text-[11px] font-bold text-muted-foreground self-center">بانتظار شركة</div>
