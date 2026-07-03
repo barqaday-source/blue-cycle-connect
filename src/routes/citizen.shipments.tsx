@@ -20,7 +20,18 @@ function MyShipments() {
     enabled: !!user,
     queryFn: async () => {
       const { data } = await supabase.from("shipments").select("*").eq("citizen_id", user!.id).order("created_at", { ascending: false });
-      return (data ?? []) as ShipmentRow[];
+      const rows = (data ?? []) as ShipmentRow[];
+      const ids = Array.from(new Set(rows.map((r) => r.company_id).filter(Boolean))) as string[];
+      const map = new Map<string, { phone: string | null; company_name: string | null }>();
+      if (ids.length) {
+        const { data: profs } = await supabase.from("profiles").select("id, phone, company_name").in("id", ids);
+        (profs ?? []).forEach((p) => map.set(p.id, { phone: p.phone, company_name: p.company_name }));
+      }
+      return rows.map((r) => ({
+        ...r,
+        company_phone: r.company_id ? map.get(r.company_id)?.phone ?? null : null,
+        company_label: r.company_id ? map.get(r.company_id)?.company_name ?? null : null,
+      }));
     },
   });
 
@@ -30,6 +41,17 @@ function MyShipments() {
     if (error) return toast.error(error.message);
     toast.success("تم الحذف");
     qc.invalidateQueries({ queryKey: ["all-my-shipments"] });
+  }
+
+  function waHref(phone: string | null, label: string) {
+    if (!phone) return null;
+    const p = phone.replace(/[^\d]/g, "").replace(/^0/, "964");
+    return `https://wa.me/${p}?text=${encodeURIComponent(label)}`;
+  }
+  function telHref(phone: string | null) {
+    if (!phone) return null;
+    const p = phone.replace(/[^\d]/g, "").replace(/^0/, "964");
+    return `tel:+${p}`;
   }
 
   return (
