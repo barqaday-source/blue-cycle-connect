@@ -13,6 +13,8 @@ export interface Profile {
   company_name: string | null;
   city: string | null;
   avatar_url: string | null;
+  lat: number | null;
+  lng: number | null;
 }
 
 interface AuthState {

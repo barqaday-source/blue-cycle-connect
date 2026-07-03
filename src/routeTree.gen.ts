@@ -27,6 +27,10 @@ import { Route as CitizenWalletRouteImport } from './routes/citizen.wallet'
 import { Route as CitizenShipmentsRouteImport } from './routes/citizen.shipments'
 import { Route as CitizenProfileRouteImport } from './routes/citizen.profile'
 import { Route as CitizenNewRouteImport } from './routes/citizen.new'
+import { Route as AccountPrivacyRouteImport } from './routes/account.privacy'
+import { Route as AccountNotificationsRouteImport } from './routes/account.notifications'
+import { Route as AccountEditRouteImport } from './routes/account.edit'
+import { Route as AccountAddressRouteImport } from './routes/account.address'
 
 const PricesRoute = PricesRouteImport.update({
   id: '/prices',
@@ -118,6 +122,26 @@ const CitizenNewRoute = CitizenNewRouteImport.update({
   path: '/new',
   getParentRoute: () => CitizenRoute,
 } as any)
+const AccountPrivacyRoute = AccountPrivacyRouteImport.update({
+  id: '/account/privacy',
+  path: '/account/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountNotificationsRoute = AccountNotificationsRouteImport.update({
+  id: '/account/notifications',
+  path: '/account/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountEditRoute = AccountEditRouteImport.update({
+  id: '/account/edit',
+  path: '/account/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountAddressRoute = AccountAddressRouteImport.update({
+  id: '/account/address',
+  path: '/account/address',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -127,6 +151,10 @@ export interface FileRoutesByFullPath {
   '/company': typeof CompanyRouteWithChildren
   '/map': typeof MapRoute
   '/prices': typeof PricesRoute
+  '/account/address': typeof AccountAddressRoute
+  '/account/edit': typeof AccountEditRoute
+  '/account/notifications': typeof AccountNotificationsRoute
+  '/account/privacy': typeof AccountPrivacyRoute
   '/citizen/new': typeof CitizenNewRoute
   '/citizen/profile': typeof CitizenProfileRoute
   '/citizen/shipments': typeof CitizenShipmentsRoute
@@ -145,6 +173,10 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/map': typeof MapRoute
   '/prices': typeof PricesRoute
+  '/account/address': typeof AccountAddressRoute
+  '/account/edit': typeof AccountEditRoute
+  '/account/notifications': typeof AccountNotificationsRoute
+  '/account/privacy': typeof AccountPrivacyRoute
   '/citizen/new': typeof CitizenNewRoute
   '/citizen/profile': typeof CitizenProfileRoute
   '/citizen/shipments': typeof CitizenShipmentsRoute
@@ -166,6 +198,10 @@ export interface FileRoutesById {
   '/company': typeof CompanyRouteWithChildren
   '/map': typeof MapRoute
   '/prices': typeof PricesRoute
+  '/account/address': typeof AccountAddressRoute
+  '/account/edit': typeof AccountEditRoute
+  '/account/notifications': typeof AccountNotificationsRoute
+  '/account/privacy': typeof AccountPrivacyRoute
   '/citizen/new': typeof CitizenNewRoute
   '/citizen/profile': typeof CitizenProfileRoute
   '/citizen/shipments': typeof CitizenShipmentsRoute
@@ -188,6 +224,10 @@ export interface FileRouteTypes {
     | '/company'
     | '/map'
     | '/prices'
+    | '/account/address'
+    | '/account/edit'
+    | '/account/notifications'
+    | '/account/privacy'
     | '/citizen/new'
     | '/citizen/profile'
     | '/citizen/shipments'
@@ -206,6 +246,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/map'
     | '/prices'
+    | '/account/address'
+    | '/account/edit'
+    | '/account/notifications'
+    | '/account/privacy'
     | '/citizen/new'
     | '/citizen/profile'
     | '/citizen/shipments'
@@ -226,6 +270,10 @@ export interface FileRouteTypes {
     | '/company'
     | '/map'
     | '/prices'
+    | '/account/address'
+    | '/account/edit'
+    | '/account/notifications'
+    | '/account/privacy'
     | '/citizen/new'
     | '/citizen/profile'
     | '/citizen/shipments'
@@ -247,6 +295,10 @@ export interface RootRouteChildren {
   CompanyRoute: typeof CompanyRouteWithChildren
   MapRoute: typeof MapRoute
   PricesRoute: typeof PricesRoute
+  AccountAddressRoute: typeof AccountAddressRoute
+  AccountEditRoute: typeof AccountEditRoute
+  AccountNotificationsRoute: typeof AccountNotificationsRoute
+  AccountPrivacyRoute: typeof AccountPrivacyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -377,6 +429,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CitizenNewRouteImport
       parentRoute: typeof CitizenRoute
     }
+    '/account/privacy': {
+      id: '/account/privacy'
+      path: '/account/privacy'
+      fullPath: '/account/privacy'
+      preLoaderRoute: typeof AccountPrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/notifications': {
+      id: '/account/notifications'
+      path: '/account/notifications'
+      fullPath: '/account/notifications'
+      preLoaderRoute: typeof AccountNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/edit': {
+      id: '/account/edit'
+      path: '/account/edit'
+      fullPath: '/account/edit'
+      preLoaderRoute: typeof AccountEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/address': {
+      id: '/account/address'
+      path: '/account/address'
+      fullPath: '/account/address'
+      preLoaderRoute: typeof AccountAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -428,6 +508,10 @@ const rootRouteChildren: RootRouteChildren = {
   CompanyRoute: CompanyRouteWithChildren,
   MapRoute: MapRoute,
   PricesRoute: PricesRoute,
+  AccountAddressRoute: AccountAddressRoute,
+  AccountEditRoute: AccountEditRoute,
+  AccountNotificationsRoute: AccountNotificationsRoute,
+  AccountPrivacyRoute: AccountPrivacyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

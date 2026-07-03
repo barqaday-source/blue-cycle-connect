@@ -20,7 +20,18 @@ function MyShipments() {
     enabled: !!user,
     queryFn: async () => {
       const { data } = await supabase.from("shipments").select("*").eq("citizen_id", user!.id).order("created_at", { ascending: false });
-      return (data ?? []) as ShipmentRow[];
+      const rows = (data ?? []) as ShipmentRow[];
+      const ids = Array.from(new Set(rows.map((r) => r.company_id).filter(Boolean))) as string[];
+      const map = new Map<string, { phone: string | null; company_name: string | null }>();
+      if (ids.length) {
+        const { data: profs } = await supabase.from("profiles").select("id, phone, company_name").in("id", ids);
+        (profs ?? []).forEach((p) => map.set(p.id, { phone: p.phone, company_name: p.company_name }));
+      }
+      return rows.map((r) => ({
+        ...r,
+        company_phone: r.company_id ? map.get(r.company_id)?.phone ?? null : null,
+        company_label: r.company_id ? map.get(r.company_id)?.company_name ?? null : null,
+      }));
     },
   });
 
@@ -30,6 +41,17 @@ function MyShipments() {
     if (error) return toast.error(error.message);
     toast.success("تم الحذف");
     qc.invalidateQueries({ queryKey: ["all-my-shipments"] });
+  }
+
+  function waHref(phone: string | null, label: string) {
+    if (!phone) return null;
+    const p = phone.replace(/[^\d]/g, "").replace(/^0/, "964");
+    return `https://wa.me/${p}?text=${encodeURIComponent(label)}`;
+  }
+  function telHref(phone: string | null) {
+    if (!phone) return null;
+    const p = phone.replace(/[^\d]/g, "").replace(/^0/, "964");
+    return `tel:+${p}`;
   }
 
   return (
@@ -60,8 +82,16 @@ function MyShipments() {
               <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border pt-3">
                 {s.company_id ? (
                   <>
-                    <button className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-success/15 py-2 text-xs font-bold text-success active:scale-95"><MessageCircle size={14} /> واتساب</button>
-                    <button className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary/10 py-2 text-xs font-bold text-primary active:scale-95"><Phone size={14} /> اتصال</button>
+                    {waHref(s.company_phone, `شركة ${s.company_label ?? ""} — بخصوص شحنة ${m.label} (${s.weight_kg} كغ)`) ? (
+                      <a href={waHref(s.company_phone, `شركة ${s.company_label ?? ""} — بخصوص شحنة ${m.label} (${s.weight_kg} كغ)`)!} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-success/15 py-2 text-xs font-bold text-success active:scale-95"><MessageCircle size={14} /> واتساب</a>
+                    ) : (
+                      <button disabled className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-muted py-2 text-xs font-bold text-muted-foreground"><MessageCircle size={14} /> واتساب</button>
+                    )}
+                    {telHref(s.company_phone) ? (
+                      <a href={telHref(s.company_phone)!} className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary/10 py-2 text-xs font-bold text-primary active:scale-95"><Phone size={14} /> اتصال</a>
+                    ) : (
+                      <button disabled className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-muted py-2 text-xs font-bold text-muted-foreground"><Phone size={14} /> اتصال</button>
+                    )}
                   </>
                 ) : (
                   <div className="col-span-2 text-center text-[11px] font-bold text-muted-foreground self-center">بانتظار شركة</div>
