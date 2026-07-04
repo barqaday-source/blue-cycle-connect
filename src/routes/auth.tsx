@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Recycle, Phone, User, Building2, LogIn, Loader2 } from "lucide-react";
+import { Mail, Lock, User, Building2, LogIn, UserPlus, Loader2, Recycle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth, ADMIN_EMAIL } from "@/lib/auth";
@@ -11,86 +11,68 @@ export const Route = createFileRoute("/auth")({
 });
 
 type RoleChoice = "citizen" | "company";
-
-// Normalize Iraqi phone to E.164-ish digits (964XXXXXXXXXX)
-function normalizePhone(raw: string) {
-  let d = raw.replace(/\D+/g, "");
-  if (d.startsWith("00")) d = d.slice(2);
-  if (d.startsWith("0")) d = "964" + d.slice(1);
-  if (!d.startsWith("964") && d.length === 10) d = "964" + d;
-  return d;
-}
-
-// Synthetic email so we can use password auth without SMS provider.
-function phoneToEmail(phone: string) {
-  return `u${phone}@phone.tadweerblue.app`;
-}
-
-function derivePassword(phone: string) {
-  const base = `tadweer-blue::${phone}::v1`;
-  let h = 0;
-  for (let i = 0; i < base.length; i++) h = (h * 31 + base.charCodeAt(i)) | 0;
-  return `Tb!${btoa(base).replace(/=/g, "")}${Math.abs(h)}`;
-}
+type Mode = "signin" | "signup";
 
 function AuthPage() {
   const nav = useNavigate();
   const { refresh } = useAuth();
+  const [mode, setMode] = useState<Mode>("signin");
   const [role, setRole] = useState<RoleChoice>("citizen");
-  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [busy, setBusy] = useState(false);
 
-  async function loginOrSignup() {
-    const cleanName = name.trim();
-    const digits = normalizePhone(phone);
-    if (!cleanName) return toast.error("الرجاء إدخال الاسم الكامل");
-    if (digits.length < 12) return toast.error("رقم الهاتف غير صحيح — مثال: 07701234567");
-    if (role === "company" && !company.trim()) return toast.error("الرجاء إدخال اسم الشركة");
+  async function afterAuth(userEmail: string | undefined, r: RoleChoice) {
+    await refresh();
+    toast.success("أهلاً بك في تدوير بلو");
+    if (userEmail?.toLowerCase() === ADMIN_EMAIL) nav({ to: "/admin" });
+    else if (r === "company") nav({ to: "/company" });
+    else nav({ to: "/citizen" });
+  }
+
+  async function submit() {
+    const em = email.trim().toLowerCase();
+    if (!em || !em.includes("@")) return toast.error("بريد إلكتروني غير صالح");
+    if (password.length < 6) return toast.error("كلمة السر يجب أن تكون 6 أحرف على الأقل");
 
     setBusy(true);
-    const email = phoneToEmail(digits);
-    const password = derivePassword(digits);
+    try {
+      if (mode === "signin") {
+        const { data, error } = await supabase.auth.signInWithPassword({ email: em, password });
+        if (error) return toast.error("بيانات الدخول غير صحيحة");
+        const r = ((data.user?.user_metadata as any)?.role as RoleChoice) ?? "citizen";
+        await afterAuth(data.user?.email, r);
+        return;
+      }
 
-    let { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      // signup
+      if (!name.trim()) return toast.error("الرجاء إدخال الاسم الكامل");
+      if (role === "company" && !company.trim()) return toast.error("الرجاء إدخال اسم الشركة");
 
-    if (error) {
-      const signup = await supabase.auth.signUp({
-        email,
+      const { data, error } = await supabase.auth.signUp({
+        email: em,
         password,
         options: {
           emailRedirectTo: window.location.origin,
           data: {
-            full_name: cleanName,
-            phone: digits,
+            full_name: name.trim(),
             role,
             company_name: role === "company" ? company.trim() : null,
           },
         },
       });
-      if (signup.error) {
-        setBusy(false);
-        return toast.error(signup.error.message);
+      if (error) return toast.error(error.message);
+      let session = data.session;
+      if (!session) {
+        const retry = await supabase.auth.signInWithPassword({ email: em, password });
+        if (retry.error) return toast.error(retry.error.message);
+        session = retry.data.session;
       }
-      data = signup.data as typeof data;
-      if (!data.session) {
-        const retry = await supabase.auth.signInWithPassword({ email, password });
-        if (retry.error) {
-          setBusy(false);
-          return toast.error(retry.error.message);
-        }
-        data = retry.data;
-      }
-    }
-
-    setBusy(false);
-    if (data?.session) {
-      await refresh();
-      toast.success("أهلاً بك في تدوير بلو");
-      if (data.session.user?.email?.toLowerCase() === ADMIN_EMAIL) nav({ to: "/admin" });
-      else if (role === "company") nav({ to: "/company" });
-      else nav({ to: "/citizen" });
+      await afterAuth(session?.user?.email, role);
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -102,30 +84,56 @@ function AuthPage() {
         </div>
         <h1 className="text-2xl font-black">تدوير بلو</h1>
         <p className="text-center text-sm text-muted-foreground">
-          سجّل برقم هاتفك بنقرة واحدة
+          {mode === "signin" ? "سجّل دخولك بالبريد وكلمة السر" : "أنشئ حسابك الجديد بسهولة"}
         </p>
       </div>
 
-      <div className="mt-8 flex flex-col gap-3">
-        <RoleSeg value={role} onChange={setRole} />
+      {/* Mode tabs — card style, no capsule */}
+      <div className="mt-8 grid grid-cols-2 gap-3">
+        <ModeCard
+          active={mode === "signin"}
+          onClick={() => setMode("signin")}
+          icon={<LogIn size={20} />}
+          title="دخول"
+          subtitle="لديّ حساب"
+        />
+        <ModeCard
+          active={mode === "signup"}
+          onClick={() => setMode("signup")}
+          icon={<UserPlus size={20} />}
+          title="حساب جديد"
+          subtitle="إنشاء حساب"
+        />
+      </div>
 
-        <Field label="الاسم الكامل" icon={<User size={18} />} placeholder="مثال: أحمد محمد" value={name} onChange={setName} autoComplete="name" />
-        {role === "company" && (
-          <Field label="اسم الشركة / المعمل" icon={<Building2 size={18} />} placeholder="مثال: شركة تدوير بغداد" value={company} onChange={setCompany} autoComplete="organization" />
+      <div className="mt-4 flex flex-col gap-3">
+        {mode === "signup" && (
+          <>
+            <div className="grid grid-cols-2 gap-3">
+              <RoleCard active={role === "citizen"} onClick={() => setRole("citizen")} icon={<User size={18} />} label="مواطن" />
+              <RoleCard active={role === "company"} onClick={() => setRole("company")} icon={<Building2 size={18} />} label="شركة" />
+            </div>
+            <Field label="الاسم الكامل" icon={<User size={18} />} placeholder="أحمد محمد" value={name} onChange={setName} autoComplete="name" />
+            {role === "company" && (
+              <Field label="اسم الشركة" icon={<Building2 size={18} />} placeholder="شركة تدوير بغداد" value={company} onChange={setCompany} autoComplete="organization" />
+            )}
+          </>
         )}
-        <Field label="رقم الهاتف" icon={<Phone size={18} />} placeholder="07701234567" value={phone} onChange={setPhone} type="tel" inputMode="numeric" autoComplete="tel" dir="ltr" />
+
+        <Field label="البريد الإلكتروني" icon={<Mail size={18} />} placeholder="name@example.com" value={email} onChange={setEmail} type="email" inputMode="email" autoComplete="email" dir="ltr" />
+        <Field label="كلمة السر" icon={<Lock size={18} />} placeholder="••••••••" value={password} onChange={setPassword} type="password" autoComplete={mode === "signin" ? "current-password" : "new-password"} dir="ltr" />
 
         <button
-          onClick={loginOrSignup}
+          onClick={submit}
           disabled={busy}
-          className="btn-primary-gradient press tap-ring mt-2 inline-flex h-[56px] items-center justify-center gap-2 rounded-2xl text-base font-extrabold disabled:opacity-60"
+          className="btn-primary-gradient press tap-ring mt-2 inline-flex h-[60px] items-center justify-center gap-2 rounded-3xl text-base font-extrabold disabled:opacity-60"
         >
-          {busy ? <Loader2 className="animate-spin" size={18} /> : <LogIn size={18} />}
-          تسجيل الدخول / إنشاء حساب
+          {busy ? <Loader2 className="animate-spin" size={18} /> : mode === "signin" ? <LogIn size={18} /> : <UserPlus size={18} />}
+          {mode === "signin" ? "دخول" : "إنشاء حساب"}
         </button>
 
         <p className="mt-2 text-center text-[11px] text-muted-foreground">
-          دخول فوري بدون رمز تحقق — فقط رقم هاتفك واسمك.
+          يمكنك إضافة رقم هاتفك لاحقاً من إعدادات البروفايل ليتواصل معك المشترون.
         </p>
       </div>
 
@@ -137,25 +145,10 @@ function AuthPage() {
 }
 
 function Field({
-  icon,
-  label,
-  placeholder,
-  value,
-  onChange,
-  type = "text",
-  inputMode,
-  autoComplete,
-  dir,
+  icon, label, placeholder, value, onChange, type = "text", inputMode, autoComplete, dir,
 }: {
-  icon: React.ReactNode;
-  label: string;
-  placeholder: string;
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-  inputMode?: "text" | "email" | "numeric" | "tel";
-  autoComplete?: string;
-  dir?: "ltr" | "rtl";
+  icon: React.ReactNode; label: string; placeholder: string; value: string; onChange: (v: string) => void;
+  type?: string; inputMode?: "text" | "email" | "numeric" | "tel"; autoComplete?: string; dir?: "ltr" | "rtl";
 }) {
   return (
     <label className="glass flex min-h-[64px] flex-col justify-center gap-1 rounded-2xl px-4 py-2 transition focus-within:ring-2 focus-within:ring-primary/40">
@@ -177,20 +170,35 @@ function Field({
   );
 }
 
-function RoleSeg({ value, onChange }: { value: RoleChoice; onChange: (v: RoleChoice) => void }) {
+function ModeCard({ active, onClick, icon, title, subtitle }: {
+  active: boolean; onClick: () => void; icon: React.ReactNode; title: string; subtitle: string;
+}) {
   return (
-    <div className="glass-card grid grid-cols-2 gap-1 rounded-2xl p-1">
-      {(["citizen", "company"] as const).map((r) => (
-        <button
-          key={r}
-          onClick={() => onChange(r)}
-          className={`h-12 rounded-xl text-sm font-extrabold transition active:scale-95 ${
-            value === r ? "btn-primary-gradient" : "text-muted-foreground"
-          }`}
-        >
-          {r === "citizen" ? "مواطن" : "شركة"}
-        </button>
-      ))}
-    </div>
+    <button
+      onClick={onClick}
+      className={`press tap-ring flex flex-col items-center justify-center gap-1 rounded-3xl p-4 text-center transition ${
+        active ? "btn-primary-gradient text-white" : "glass-card text-foreground"
+      }`}
+    >
+      <span className={active ? "text-white" : "text-primary"}>{icon}</span>
+      <span className="text-sm font-extrabold">{title}</span>
+      <span className={`text-[10px] ${active ? "text-white/85" : "text-muted-foreground"}`}>{subtitle}</span>
+    </button>
+  );
+}
+
+function RoleCard({ active, onClick, icon, label }: {
+  active: boolean; onClick: () => void; icon: React.ReactNode; label: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`press flex items-center justify-center gap-2 rounded-2xl p-3 text-sm font-extrabold transition ${
+        active ? "btn-primary-gradient text-white" : "glass-card text-foreground"
+      }`}
+    >
+      <span className={active ? "text-white" : "text-primary"}>{icon}</span>
+      {label}
+    </button>
   );
 }
