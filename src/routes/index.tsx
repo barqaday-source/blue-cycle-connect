@@ -15,21 +15,72 @@ export const Route = createFileRoute("/")({
 
 function Splash() {
   return (
-    <main className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--gradient-sky)] px-6">
-      <div className="btn-primary-gradient float-in grid h-28 w-28 place-items-center rounded-[2rem]">
-        <Recycle size={54} className="text-white" />
-      </div>
-      <h1 className="float-in mt-6 text-3xl font-black tracking-tight">تدوير بلو</h1>
-      <p className="float-in mt-2 text-center text-sm text-muted-foreground">
-        نظّف مدينتك — اكسب من مواردك
-      </p>
+    <main
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6"
+      style={{ background: "#A6C5E5" }}
+    >
+      {/* Logo shield */}
       <div
-        className="absolute bottom-8 flex items-center justify-center gap-1.5 font-buster text-[15px] text-indigo-brand"
-        dir="ltr"
+        className="float-in relative grid place-items-center rounded-[42%_42%_42%_42%/48%_48%_38%_38%] shadow-[0_20px_60px_-15px_rgba(13,71,161,0.45)]"
+        style={{
+          width: 168,
+          height: 200,
+          background: "linear-gradient(160deg, #1E5FBF 0%, #0D47A1 55%, #072d6b 100%)",
+        }}
       >
-        <span className="opacity-70">from</span>
-        <span>BLUE</span>
+        <span
+          className="font-black text-white"
+          style={{ fontSize: 68, lineHeight: 1, fontFamily: "Tajawal, system-ui" }}
+        >
+          بلو
+        </span>
       </div>
+
+      <p
+        className="float-in mt-8 text-center font-extrabold"
+        style={{ color: "#0D47A1", fontSize: 20 }}
+      >
+        خدماتك .. بكل سهولة
+      </p>
+
+      {/* Loading bar */}
+      <div
+        className="float-in mt-10 h-1.5 w-40 overflow-hidden rounded-full"
+        style={{ background: "rgba(13,71,161,0.15)" }}
+      >
+        <div
+          className="h-full rounded-full"
+          style={{
+            width: "40%",
+            background: "#0D47A1",
+            animation: "blueLoad 1.6s ease-in-out infinite",
+          }}
+        />
+      </div>
+      <p className="mt-3 text-xs" style={{ color: "#0D47A1", opacity: 0.75 }}>
+        جاري التحميل...
+      </p>
+
+      {/* BLUE Services meta branding — bottom */}
+      <div
+        className="absolute bottom-8 flex flex-col items-center leading-none"
+        dir="ltr"
+        style={{ color: "#0D47A1" }}
+      >
+        <span className="font-buster" style={{ fontSize: 22 }}>BLUE</span>
+        <span
+          className="mt-1 font-buster tracking-[0.35em]"
+          style={{ fontSize: 8, opacity: 0.75 }}
+        >
+          SERVICES
+        </span>
+      </div>
+
+      <style>{`@keyframes blueLoad {
+        0% { transform: translateX(-100%); }
+        50% { transform: translateX(150%); }
+        100% { transform: translateX(150%); }
+      }`}</style>
     </main>
   );
 }
