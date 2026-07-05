@@ -1,10 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Mail, Lock, User, Building2, Loader2 } from "lucide-react";
+import { Mail, Lock, User, Building2, Loader2, Recycle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth, ADMIN_EMAIL } from "@/lib/auth";
-import logoAsset from "@/assets/tadweer-logo.asset.json";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "تدوير بلو — تسجيل الدخول" }] }),
@@ -17,11 +16,13 @@ type RoleChoice = "citizen" | "company";
 
 const T = {
   ar: {
-    dir: "rtl" as const,
+    ar: "العربية", ku: "کوردی",
     brand: "تدوير بلو",
     tagline: "أعد التدوير، اكسب، احمِ البيئة",
     signin: "دخول",
     signup: "حساب جديد",
+    google: "متابعة عبر Google",
+    or: "أو",
     email: "البريد الإلكتروني",
     password: "كلمة السر",
     name: "الاسم الكامل",
@@ -36,13 +37,16 @@ const T = {
     companyBad: "الرجاء إدخال اسم الشركة",
     signinFail: "بيانات الدخول غير صحيحة",
     welcome: "أهلاً بك في تدوير بلو",
+    googleSoon: "تسجيل الدخول بجوجل قريباً",
   },
   ku: {
-    dir: "rtl" as const,
+    ar: "العربية", ku: "کوردی",
     brand: "تەدویری بلو",
     tagline: "دووبارە بەکاربێنە، قازانج بکە، ژینگە بپارێزە",
     signin: "چوونەژوورەوە",
     signup: "هەژماری نوێ",
+    google: "بەردەوامبوون بە Google",
+    or: "یان",
     email: "ئیمەیڵ",
     password: "وشەی نهێنی",
     name: "ناوی تەواو",
@@ -57,8 +61,12 @@ const T = {
     companyBad: "تکایە ناوی کۆمپانیا بنووسە",
     signinFail: "زانیارییەکانی چوونەژوورەوە هەڵەیە",
     welcome: "بەخێربێیت بۆ تەدویری بلو",
+    googleSoon: "چوونەژوورەوە بە گووگڵ بەم زووانە",
   },
 };
+
+const BLUE = "#1E63FF";
+const SOFT = "#EEF3FE";
 
 function AuthPage() {
   const nav = useNavigate();
@@ -116,50 +124,81 @@ function AuthPage() {
   }
 
   return (
-    <main dir={t.dir} className="mx-auto min-h-screen w-full max-w-[460px] bg-white">
-      {/* Blue hero card with language toggle */}
-      <section className="relative rounded-b-[36px] bg-[#1E63FF] px-6 pb-14 pt-6 text-white">
-        {/* Language pill */}
-        <div className="mb-6 inline-flex items-center gap-1 rounded-full bg-white/15 p-1 backdrop-blur">
+    <main dir="rtl" className="mx-auto min-h-screen w-full max-w-[460px] bg-white">
+      {/* Blue hero */}
+      <section className="relative rounded-b-[40px] px-6 pb-16 pt-6" style={{ backgroundColor: BLUE }}>
+        {/* Language pill (top-start) */}
+        <div className="inline-flex items-center gap-1 rounded-full bg-white/15 p-1 backdrop-blur">
           {(["ar", "ku"] as Lang[]).map((L) => (
             <button
               key={L}
               onClick={() => setLang(L)}
               className={`rounded-full px-4 py-1.5 text-xs font-extrabold transition ${
-                lang === L ? "bg-white text-[#1E63FF]" : "text-white/90"
+                lang === L ? "bg-white" : "text-white/95"
               }`}
+              style={lang === L ? { color: BLUE } : undefined}
             >
-              {L === "ar" ? "العربية" : "کوردی"}
+              {L === "ar" ? t.ar : t.ku}
             </button>
           ))}
         </div>
 
-        <div className="flex flex-col items-center gap-3 pt-2">
-          <div className="grid h-24 w-24 place-items-center overflow-hidden rounded-[26px] bg-white shadow-[0_10px_30px_-8px_rgba(0,0,0,0.35)]">
-            <img src={logoAsset.url} alt={t.brand} className="h-full w-full object-cover" />
+        {/* Logo + brand */}
+        <div className="mt-6 flex flex-col items-center gap-2">
+          <div
+            className="grid h-[104px] w-[104px] place-items-center rounded-[28px] bg-white"
+            style={{ boxShadow: "0 18px 40px -14px rgba(0,0,0,0.28)" }}
+          >
+            <Recycle size={54} strokeWidth={2.2} style={{ color: BLUE }} />
           </div>
-          <h1 className="mt-1 text-3xl font-black tracking-tight">{t.brand}</h1>
-          <p className="text-sm font-medium text-white/85">{t.tagline}</p>
+          <h1 className="mt-4 text-[34px] font-black leading-none tracking-tight text-white">{t.brand}</h1>
+          <p className="mt-2 text-[13px] font-medium text-white/85">{t.tagline}</p>
         </div>
       </section>
 
-      {/* Tabs card that overlaps the hero */}
+      {/* Tabs overlapping the hero */}
       <section className="px-6">
-        <div className="-mt-8 grid grid-cols-2 gap-1 rounded-full bg-[#EEF3FE] p-1 shadow-[0_6px_20px_-8px_rgba(30,99,255,0.35)]">
-          {(["signin", "signup"] as Mode[]).map((m) => (
-            <button
-              key={m}
-              onClick={() => setMode(m)}
-              className={`h-11 rounded-full text-sm font-extrabold transition ${
-                mode === m ? "bg-[#1E63FF] text-white shadow" : "text-[#1E63FF]/70"
-              }`}
-            >
-              {m === "signin" ? t.signin : t.signup}
-            </button>
-          ))}
+        <div
+          className="-mt-8 grid grid-cols-2 gap-1 rounded-full p-1"
+          style={{ backgroundColor: SOFT, boxShadow: "0 10px 24px -12px rgba(30,99,255,0.35)" }}
+        >
+          {(["signin", "signup"] as Mode[]).map((m) => {
+            const active = mode === m;
+            return (
+              <button
+                key={m}
+                onClick={() => setMode(m)}
+                className="h-12 rounded-full text-[15px] font-extrabold transition"
+                style={
+                  active
+                    ? { backgroundColor: BLUE, color: "#fff", boxShadow: "0 6px 16px -6px rgba(30,99,255,0.6)" }
+                    : { color: `${BLUE}B3` }
+                }
+              >
+                {m === "signin" ? t.signin : t.signup}
+              </button>
+            );
+          })}
         </div>
 
         <div className="mt-6 flex flex-col gap-4">
+          {/* Google button */}
+          <button
+            onClick={() => toast.info(t.googleSoon)}
+            className="flex h-[52px] w-full items-center justify-center gap-3 rounded-full border bg-white text-[15px] font-extrabold"
+            style={{ borderColor: `${BLUE}33`, color: "#0D2A66" }}
+          >
+            <GoogleIcon />
+            {t.google}
+          </button>
+
+          {/* أو divider */}
+          <div className="flex items-center gap-3">
+            <span className="h-px flex-1" style={{ backgroundColor: `${BLUE}33` }} />
+            <span className="text-xs font-bold" style={{ color: `${BLUE}99` }}>{t.or}</span>
+            <span className="h-px flex-1" style={{ backgroundColor: `${BLUE}33` }} />
+          </div>
+
           {mode === "signup" && (
             <>
               <div className="grid grid-cols-2 gap-3">
@@ -179,11 +218,14 @@ function AuthPage() {
           <button
             onClick={submit}
             disabled={busy}
-            className="mt-2 inline-flex h-[58px] w-full items-center justify-center gap-2 rounded-full bg-[#1E63FF] text-base font-extrabold text-white shadow-[0_12px_28px_-10px_rgba(30,99,255,0.6)] transition active:scale-[0.98] disabled:opacity-60"
+            className="mt-2 inline-flex h-[58px] w-full items-center justify-center gap-2 rounded-full text-[16px] font-extrabold text-white transition active:scale-[0.98] disabled:opacity-60"
+            style={{ backgroundColor: BLUE, boxShadow: "0 14px 30px -10px rgba(30,99,255,0.55)" }}
           >
             {busy && <Loader2 className="animate-spin" size={18} />}
             {mode === "signin" ? t.submitIn : t.submitUp}
           </button>
+
+          <div className="h-8" />
         </div>
       </section>
     </main>
@@ -198,17 +240,18 @@ function Field({
 }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="px-1 text-xs font-bold text-[#1E63FF]/80">{label}</span>
-      <div className="flex h-[54px] items-center gap-3 rounded-full bg-[#EEF3FE] px-5">
+      <span className="px-2 text-[11px] font-bold" style={{ color: `${BLUE}B3` }}>{label}</span>
+      <div className="flex h-[52px] items-center gap-3 rounded-full px-5" style={{ backgroundColor: SOFT }}>
         <input
           type={type}
           dir={dir}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="flex-1 bg-transparent text-base font-bold text-[#0D2A66] outline-none placeholder:text-[#1E63FF]/40"
+          className="flex-1 bg-transparent text-[15px] font-bold outline-none"
+          style={{ color: "#0D2A66" }}
         />
-        <span className="text-[#1E63FF]/70">{icon}</span>
+        <span style={{ color: `${BLUE}B3` }}>{icon}</span>
       </div>
     </label>
   );
@@ -218,12 +261,26 @@ function RoleCard({ active, onClick, icon, label }: { active: boolean; onClick: 
   return (
     <button
       onClick={onClick}
-      className={`flex h-12 items-center justify-center gap-2 rounded-full text-sm font-extrabold transition ${
-        active ? "bg-[#1E63FF] text-white shadow" : "bg-[#EEF3FE] text-[#1E63FF]"
-      }`}
+      className="flex h-12 items-center justify-center gap-2 rounded-full text-sm font-extrabold transition"
+      style={
+        active
+          ? { backgroundColor: BLUE, color: "#fff", boxShadow: "0 6px 16px -6px rgba(30,99,255,0.5)" }
+          : { backgroundColor: SOFT, color: BLUE }
+      }
     >
       {icon}
       {label}
     </button>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.6 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.3-.4-3.5z"/>
+      <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 18.9 12 24 12c3 0 5.7 1.1 7.8 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/>
+      <path fill="#4CAF50" d="M24 44c5.2 0 10-2 13.6-5.2l-6.3-5.3C29.2 34.9 26.7 36 24 36c-5.4 0-9.9-3.4-11.4-8.1l-6.5 5C9.4 39.6 16.1 44 24 44z"/>
+      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.7 2-2 3.7-3.7 4.9l6.3 5.3C41.4 34.9 44 30 44 24c0-1.2-.1-2.3-.4-3.5z"/>
+    </svg>
   );
 }
