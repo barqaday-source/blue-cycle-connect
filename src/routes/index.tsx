@@ -61,20 +61,14 @@ function Splash() {
         جاري التحميل...
       </p>
 
-      {/* BLUE Services meta branding — bottom */}
+      {/* brand mark bottom */}
       <div
         className="absolute bottom-8 flex flex-col items-center leading-none"
-        dir="ltr"
         style={{ color: "#0D47A1" }}
       >
-        <span className="font-buster" style={{ fontSize: 22 }}>BLUE</span>
-        <span
-          className="mt-1 font-buster tracking-[0.35em]"
-          style={{ fontSize: 8, opacity: 0.75 }}
-        >
-          SERVICES
-        </span>
+        <span className="font-black" style={{ fontSize: 18, fontFamily: "Cairo, system-ui" }}>تدوير بلو</span>
       </div>
+
 
       <style>{`@keyframes blueLoad {
         0% { transform: translateX(-100%); }

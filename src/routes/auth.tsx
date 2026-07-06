@@ -2,11 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Mail, Lock, User, Building2, Loader2, Recycle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import { useAuth, ADMIN_EMAIL } from "@/lib/auth";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "تدوير بلو — تسجيل الدخول" }] }),
+  head: () => ({ meta: [{ title: "تدوير بلو — الدخول" }] }),
   component: AuthPage,
 });
 
@@ -18,55 +19,40 @@ const T = {
   ar: {
     ar: "العربية", ku: "کوردی",
     brand: "تدوير بلو",
-    tagline: "أعد التدوير، اكسب، احمِ البيئة",
-    signin: "دخول",
-    signup: "حساب جديد",
+    tagline: "أعد التدوير • اكسب • احمِ البيئة",
+    signin: "دخول", signup: "تسجيل",
     google: "متابعة عبر Google",
     or: "أو",
-    email: "البريد الإلكتروني",
-    password: "كلمة السر",
-    name: "الاسم الكامل",
-    company: "اسم الشركة",
-    roleCitizen: "مواطن",
-    roleCompany: "شركة",
-    submitIn: "دخول",
-    submitUp: "إنشاء حساب",
-    emailBad: "بريد إلكتروني غير صالح",
-    passBad: "كلمة السر يجب أن تكون 6 أحرف على الأقل",
-    nameBad: "الرجاء إدخال الاسم الكامل",
-    companyBad: "الرجاء إدخال اسم الشركة",
+    email: "البريد", password: "كلمة السر",
+    name: "الاسم", company: "اسم الشركة",
+    roleCitizen: "مواطن", roleCompany: "شركة",
+    submitIn: "دخول", submitUp: "إنشاء حساب",
+    emailBad: "بريد غير صالح", passBad: "كلمة السر 6 أحرف على الأقل",
+    nameBad: "أدخل الاسم", companyBad: "أدخل اسم الشركة",
     signinFail: "بيانات الدخول غير صحيحة",
-    welcome: "أهلاً بك في تدوير بلو",
-    googleSoon: "تسجيل الدخول بجوجل قريباً",
+    welcome: "أهلاً بك",
   },
   ku: {
     ar: "العربية", ku: "کوردی",
     brand: "تەدویری بلو",
-    tagline: "دووبارە بەکاربێنە، قازانج بکە، ژینگە بپارێزە",
-    signin: "چوونەژوورەوە",
-    signup: "هەژماری نوێ",
+    tagline: "دووبارە بەکاربێنە • قازانج بکە • ژینگە بپارێزە",
+    signin: "چوونەژوورەوە", signup: "خۆتۆمارکردن",
     google: "بەردەوامبوون بە Google",
     or: "یان",
-    email: "ئیمەیڵ",
-    password: "وشەی نهێنی",
-    name: "ناوی تەواو",
-    company: "ناوی کۆمپانیا",
-    roleCitizen: "هاووڵاتی",
-    roleCompany: "کۆمپانیا",
-    submitIn: "چوونەژوورەوە",
-    submitUp: "دروستکردنی هەژمار",
-    emailBad: "ئیمەیڵ ڕاست نییە",
-    passBad: "وشەی نهێنی دەبێت لانیکەم ٦ پیت بێت",
-    nameBad: "تکایە ناوی تەواو بنووسە",
-    companyBad: "تکایە ناوی کۆمپانیا بنووسە",
-    signinFail: "زانیارییەکانی چوونەژوورەوە هەڵەیە",
-    welcome: "بەخێربێیت بۆ تەدویری بلو",
-    googleSoon: "چوونەژوورەوە بە گووگڵ بەم زووانە",
+    email: "ئیمەیڵ", password: "وشەی نهێنی",
+    name: "ناو", company: "ناوی کۆمپانیا",
+    roleCitizen: "هاووڵاتی", roleCompany: "کۆمپانیا",
+    submitIn: "چوونەژوورەوە", submitUp: "دروستکردن",
+    emailBad: "ئیمەیڵ ڕاست نییە", passBad: "وشەی نهێنی ٦ پیت",
+    nameBad: "ناو بنووسە", companyBad: "ناوی کۆمپانیا بنووسە",
+    signinFail: "زانیارییەکان هەڵەیە",
+    welcome: "بەخێربێیت",
   },
 };
 
 const BLUE = "#1E63FF";
 const SOFT = "#EEF3FE";
+const INK = "#0D2A66";
 
 function AuthPage() {
   const nav = useNavigate();
@@ -79,6 +65,7 @@ function AuthPage() {
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [busy, setBusy] = useState(false);
+  const [gbusy, setGbusy] = useState(false);
   const t = T[lang];
 
   async function afterAuth(userEmail: string | undefined, r: RoleChoice) {
@@ -87,6 +74,27 @@ function AuthPage() {
     if (userEmail?.toLowerCase() === ADMIN_EMAIL) nav({ to: "/admin" });
     else if (r === "company") nav({ to: "/company" });
     else nav({ to: "/citizen" });
+  }
+
+  async function googleSignIn() {
+    setGbusy(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error((result.error as Error).message || "تعذر الدخول عبر Google");
+        return;
+      }
+      if (result.redirected) return;
+      const { data } = await supabase.auth.getUser();
+      const r = ((data.user?.user_metadata as { role?: RoleChoice })?.role) ?? "citizen";
+      await afterAuth(data.user?.email ?? undefined, r);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setGbusy(false);
+    }
   }
 
   async function submit() {
@@ -124,56 +132,43 @@ function AuthPage() {
   }
 
   return (
-    <main dir="rtl" className="mx-auto min-h-screen w-full max-w-[460px] bg-white">
-      {/* Blue hero */}
-      <section className="relative rounded-b-[40px] px-6 pb-16 pt-6" style={{ backgroundColor: BLUE }}>
-        {/* Language pill (top-start) */}
-        <div className="inline-flex items-center gap-1 rounded-full bg-white/15 p-1 backdrop-blur">
+    <main dir="rtl" className="mx-auto min-h-screen w-full max-w-[420px] bg-white" style={{ fontFamily: "Cairo, system-ui" }}>
+      {/* Hero */}
+      <section className="relative rounded-b-[32px] px-5 pb-12 pt-4" style={{ backgroundColor: BLUE }}>
+        <div className="inline-flex items-center gap-1 rounded-2xl bg-white/15 p-1 backdrop-blur">
           {(["ar", "ku"] as Lang[]).map((L) => (
             <button
               key={L}
               onClick={() => setLang(L)}
-              className={`rounded-full px-4 py-1.5 text-xs font-extrabold transition ${
-                lang === L ? "bg-white" : "text-white/95"
-              }`}
-              style={lang === L ? { color: BLUE } : undefined}
+              className="rounded-xl px-3 py-1 text-[11px] font-extrabold transition"
+              style={lang === L ? { background: "#fff", color: BLUE } : { color: "#fff" }}
             >
               {L === "ar" ? t.ar : t.ku}
             </button>
           ))}
         </div>
 
-        {/* Logo + brand */}
-        <div className="mt-6 flex flex-col items-center gap-2">
-          <div
-            className="grid h-[104px] w-[104px] place-items-center rounded-[28px] bg-white"
-            style={{ boxShadow: "0 18px 40px -14px rgba(0,0,0,0.28)" }}
-          >
-            <Recycle size={54} strokeWidth={2.2} style={{ color: BLUE }} />
+        <div className="mt-4 flex flex-col items-center gap-1">
+          <div className="grid h-[84px] w-[84px] place-items-center rounded-3xl bg-white shadow-[0_14px_30px_-12px_rgba(0,0,0,0.28)]">
+            <Recycle size={44} strokeWidth={2.2} style={{ color: BLUE }} />
           </div>
-          <h1 className="mt-4 text-[34px] font-black leading-none tracking-tight text-white">{t.brand}</h1>
-          <p className="mt-2 text-[13px] font-medium text-white/85">{t.tagline}</p>
+          <h1 className="mt-3 text-[26px] font-black leading-none text-white">{t.brand}</h1>
+          <p className="mt-1 text-[12px] font-medium text-white/85">{t.tagline}</p>
         </div>
       </section>
 
-      {/* Tabs overlapping the hero */}
-      <section className="px-6">
-        <div
-          className="-mt-8 grid grid-cols-2 gap-1 rounded-full p-1"
-          style={{ backgroundColor: SOFT, boxShadow: "0 10px 24px -12px rgba(30,99,255,0.35)" }}
-        >
+      {/* Tabs */}
+      <section className="px-5">
+        <div className="-mt-6 grid grid-cols-2 gap-1 rounded-2xl p-1"
+             style={{ background: SOFT, boxShadow: "0 8px 20px -10px rgba(30,99,255,0.35)" }}>
           {(["signin", "signup"] as Mode[]).map((m) => {
             const active = mode === m;
             return (
               <button
                 key={m}
                 onClick={() => setMode(m)}
-                className="h-12 rounded-full text-[15px] font-extrabold transition"
-                style={
-                  active
-                    ? { backgroundColor: BLUE, color: "#fff", boxShadow: "0 6px 16px -6px rgba(30,99,255,0.6)" }
-                    : { color: `${BLUE}B3` }
-                }
+                className="h-10 rounded-xl text-[13px] font-extrabold transition"
+                style={active ? { background: BLUE, color: "#fff" } : { color: `${BLUE}B3` }}
               >
                 {m === "signin" ? t.signin : t.signup}
               </button>
@@ -181,75 +176,71 @@ function AuthPage() {
           })}
         </div>
 
-        <div className="mt-6 flex flex-col gap-4">
-          {/* Google button */}
+        <div className="mt-4 flex flex-col gap-3">
           <button
-            onClick={() => toast.info(t.googleSoon)}
-            className="flex h-[52px] w-full items-center justify-center gap-3 rounded-full border bg-white text-[15px] font-extrabold"
-            style={{ borderColor: `${BLUE}33`, color: "#0D2A66" }}
+            onClick={googleSignIn}
+            disabled={gbusy}
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl border bg-white text-[13px] font-extrabold disabled:opacity-60"
+            style={{ borderColor: `${BLUE}33`, color: INK }}
           >
-            <GoogleIcon />
+            {gbusy ? <Loader2 className="animate-spin" size={16} /> : <GoogleIcon />}
             {t.google}
           </button>
 
-          {/* أو divider */}
-          <div className="flex items-center gap-3">
-            <span className="h-px flex-1" style={{ backgroundColor: `${BLUE}33` }} />
-            <span className="text-xs font-bold" style={{ color: `${BLUE}99` }}>{t.or}</span>
-            <span className="h-px flex-1" style={{ backgroundColor: `${BLUE}33` }} />
+          <div className="flex items-center gap-2">
+            <span className="h-px flex-1" style={{ background: `${BLUE}33` }} />
+            <span className="text-[10px] font-bold" style={{ color: `${BLUE}99` }}>{t.or}</span>
+            <span className="h-px flex-1" style={{ background: `${BLUE}33` }} />
           </div>
 
           {mode === "signup" && (
             <>
-              <div className="grid grid-cols-2 gap-3">
-                <RoleCard active={role === "citizen"} onClick={() => setRole("citizen")} icon={<User size={16} />} label={t.roleCitizen} />
-                <RoleCard active={role === "company"} onClick={() => setRole("company")} icon={<Building2 size={16} />} label={t.roleCompany} />
+              <div className="grid grid-cols-2 gap-2">
+                <RoleCard active={role === "citizen"} onClick={() => setRole("citizen")} icon={<User size={14} />} label={t.roleCitizen} />
+                <RoleCard active={role === "company"} onClick={() => setRole("company")} icon={<Building2 size={14} />} label={t.roleCompany} />
               </div>
-              <Field label={t.name} icon={<User size={18} />} value={name} onChange={setName} />
+              <Field label={t.name} icon={<User size={16} />} value={name} onChange={setName} />
               {role === "company" && (
-                <Field label={t.company} icon={<Building2 size={18} />} value={company} onChange={setCompany} />
+                <Field label={t.company} icon={<Building2 size={16} />} value={company} onChange={setCompany} />
               )}
             </>
           )}
 
-          <Field label={t.email} icon={<Mail size={18} />} value={email} onChange={setEmail} type="email" dir="ltr" placeholder="you@example.com" />
-          <Field label={t.password} icon={<Lock size={18} />} value={password} onChange={setPassword} type="password" dir="ltr" placeholder="••••••" />
+          <Field label={t.email} icon={<Mail size={16} />} value={email} onChange={setEmail} type="email" dir="ltr" placeholder="you@example.com" />
+          <Field label={t.password} icon={<Lock size={16} />} value={password} onChange={setPassword} type="password" dir="ltr" placeholder="••••••" />
 
           <button
             onClick={submit}
             disabled={busy}
-            className="mt-2 inline-flex h-[58px] w-full items-center justify-center gap-2 rounded-full text-[16px] font-extrabold text-white transition active:scale-[0.98] disabled:opacity-60"
-            style={{ backgroundColor: BLUE, boxShadow: "0 14px 30px -10px rgba(30,99,255,0.55)" }}
+            className="mt-1 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl text-[14px] font-extrabold text-white transition active:scale-[0.98] disabled:opacity-60"
+            style={{ background: BLUE, boxShadow: "0 10px 22px -10px rgba(30,99,255,0.55)" }}
           >
-            {busy && <Loader2 className="animate-spin" size={18} />}
+            {busy && <Loader2 className="animate-spin" size={16} />}
             {mode === "signin" ? t.submitIn : t.submitUp}
           </button>
-
-          <div className="h-8" />
+          <div className="h-6" />
         </div>
       </section>
     </main>
   );
 }
 
-function Field({
-  icon, label, value, onChange, type = "text", dir, placeholder,
-}: {
+function Field({ icon, label, value, onChange, type = "text", dir, placeholder }: {
   icon: React.ReactNode; label: string; value: string; onChange: (v: string) => void;
   type?: string; dir?: "ltr" | "rtl"; placeholder?: string;
 }) {
   return (
-    <label className="flex flex-col gap-1.5">
-      <span className="px-2 text-[11px] font-bold" style={{ color: `${BLUE}B3` }}>{label}</span>
-      <div className="flex h-[52px] items-center gap-3 rounded-full px-5" style={{ backgroundColor: SOFT }}>
+    <label className="flex flex-col gap-1">
+      <span className="px-1 text-[10px] font-bold" style={{ color: `${BLUE}B3` }}>{label}</span>
+      <div className="flex h-11 items-center gap-2 rounded-2xl px-4" style={{ background: SOFT }}>
         <input
           type={type}
           dir={dir}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="flex-1 bg-transparent text-[15px] font-bold outline-none"
-          style={{ color: "#0D2A66" }}
+          className="flex-1 bg-transparent text-[13px] font-bold outline-none"
+          style={{ color: INK }}
         />
         <span style={{ color: `${BLUE}B3` }}>{icon}</span>
       </div>
@@ -261,22 +252,17 @@ function RoleCard({ active, onClick, icon, label }: { active: boolean; onClick: 
   return (
     <button
       onClick={onClick}
-      className="flex h-12 items-center justify-center gap-2 rounded-full text-sm font-extrabold transition"
-      style={
-        active
-          ? { backgroundColor: BLUE, color: "#fff", boxShadow: "0 6px 16px -6px rgba(30,99,255,0.5)" }
-          : { backgroundColor: SOFT, color: BLUE }
-      }
+      className="flex h-10 items-center justify-center gap-1.5 rounded-2xl text-[12px] font-extrabold transition"
+      style={active ? { background: BLUE, color: "#fff" } : { background: SOFT, color: BLUE }}
     >
-      {icon}
-      {label}
+      {icon}{label}
     </button>
   );
 }
 
 function GoogleIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true">
       <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.6 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.3-.4-3.5z"/>
       <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 18.9 12 24 12c3 0 5.7 1.1 7.8 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/>
       <path fill="#4CAF50" d="M24 44c5.2 0 10-2 13.6-5.2l-6.3-5.3C29.2 34.9 26.7 36 24 36c-5.4 0-9.9-3.4-11.4-8.1l-6.5 5C9.4 39.6 16.1 44 24 44z"/>

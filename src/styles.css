@@ -36,8 +36,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-surface: var(--surface);
-  --font-display: "Tajawal", system-ui, sans-serif;
-  --font-sans: "Tajawal", system-ui, sans-serif;
+  --font-display: "Cairo", system-ui, sans-serif;
+  --font-sans: "Cairo", system-ui, sans-serif;
   --shadow-card: 0 8px 30px -8px oklch(0.7 0.08 240 / 0.18);
   --shadow-float: 0 20px 50px -12px oklch(0.55 0.18 250 / 0.35);
   --gradient-sky: linear-gradient(180deg, oklch(0.97 0.03 250) 0%, oklch(0.99 0.012 250) 60%, oklch(1 0 0) 100%);
