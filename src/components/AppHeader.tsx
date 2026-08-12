@@ -12,8 +12,9 @@ interface Props {
 
 export function AppHeader({ title, subtitle, avatar, right, back, hideMenu }: Props) {
   return (
-    <header className="sticky top-0 z-30 -mx-4 mb-2 px-4 pb-4 pt-5">
-      <div className="glass grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-full px-2 py-2 float-in">
+    <header className="sticky top-0 z-30 -mx-4 mb-2 bg-background/80 px-4 pb-4 pt-5 backdrop-blur-xl">
+      <div className="glass grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-3xl px-2.5 py-2.5 float-in">
+
         <div className="shrink-0">
           {back ?? avatar ?? (!hideMenu ? <SideMenu /> : null)}
         </div>
