@@ -132,49 +132,69 @@ function AuthPage() {
   }
 
   return (
-    <main dir="rtl" className="mx-auto min-h-screen w-full max-w-[420px] bg-white" style={{ fontFamily: "Cairo, system-ui" }}>
+    <main dir="rtl" className="relative mx-auto min-h-screen w-full max-w-[420px] overflow-hidden bg-white" style={{ fontFamily: "Cairo, system-ui" }}>
+      <div
+        className="pointer-events-none absolute -top-24 -right-16 h-64 w-64 rounded-full opacity-40 blur-3xl"
+        style={{ background: `radial-gradient(closest-side, ${BLUE}55, transparent)` }}
+      />
+      <div
+        className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full opacity-30 blur-3xl"
+        style={{ background: `radial-gradient(closest-side, ${BLUE}44, transparent)` }}
+      />
+
       {/* Hero */}
-      <section className="relative rounded-b-[32px] px-5 pb-12 pt-4" style={{ backgroundColor: BLUE }}>
-        <div className="inline-flex items-center gap-1 rounded-2xl bg-white/15 p-1 backdrop-blur">
+      <section className="relative z-10 px-5 pb-6 pt-5">
+        <div
+          className="inline-flex items-center gap-1 rounded-2xl p-1"
+          style={{ background: SOFT, border: `1px solid ${BLUE}1F` }}
+        >
           {(["ar", "ku"] as Lang[]).map((L) => (
             <button
               key={L}
               onClick={() => setLang(L)}
               className="rounded-xl px-3 py-1 text-[11px] font-extrabold transition"
-              style={lang === L ? { background: "#fff", color: BLUE } : { color: "#fff" }}
+              style={lang === L ? { background: BLUE, color: "#fff" } : { color: `${BLUE}B3` }}
             >
               {L === "ar" ? t.ar : t.ku}
             </button>
           ))}
         </div>
 
-        <div className="mt-4 flex flex-col items-center gap-1">
-          <div className="grid h-[84px] w-[84px] place-items-center rounded-3xl bg-white shadow-[0_14px_30px_-12px_rgba(0,0,0,0.28)]">
+        <div className="mt-5 flex flex-col items-center gap-1">
+          <div
+            className="grid h-[84px] w-[84px] place-items-center rounded-[28px]"
+            style={{
+              background: "rgba(30,99,255,0.06)",
+              border: "1px solid rgba(30,99,255,0.18)",
+              backdropFilter: "blur(8px)",
+            }}
+          >
             <Recycle size={44} strokeWidth={2.2} style={{ color: BLUE }} />
           </div>
-          <h1 className="mt-3 text-[26px] font-black leading-none text-white">{t.brand}</h1>
-          <p className="mt-1 text-[12px] font-medium text-white/85">{t.tagline}</p>
+          <h1 className="mt-3 text-[26px] font-black leading-none" style={{ color: INK }}>{t.brand}</h1>
+          <p className="mt-1 text-[12px] font-medium" style={{ color: `${INK}99` }}>{t.tagline}</p>
         </div>
       </section>
 
       {/* Tabs */}
-      <section className="px-5">
-        <div className="-mt-6 grid grid-cols-2 gap-1 rounded-2xl p-1"
-             style={{ background: SOFT, boxShadow: "0 8px 20px -10px rgba(30,99,255,0.35)" }}>
+      <section className="relative z-10 px-5">
+        <div className="grid grid-cols-2 gap-1 rounded-3xl p-1"
+             style={{ background: SOFT, border: `1px solid ${BLUE}1F` }}>
           {(["signin", "signup"] as Mode[]).map((m) => {
             const active = mode === m;
             return (
               <button
                 key={m}
                 onClick={() => setMode(m)}
-                className="h-10 rounded-xl text-[13px] font-extrabold transition"
-                style={active ? { background: BLUE, color: "#fff" } : { color: `${BLUE}B3` }}
+                className="h-11 rounded-[20px] text-[13px] font-extrabold transition active:scale-[0.98]"
+                style={active ? { background: BLUE, color: "#fff", boxShadow: "0 10px 22px -12px rgba(30,99,255,0.6)" } : { color: `${BLUE}B3` }}
               >
                 {m === "signin" ? t.signin : t.signup}
               </button>
             );
           })}
         </div>
+
 
         <div className="mt-4 flex flex-col gap-3">
           <button
