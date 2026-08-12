@@ -14,11 +14,11 @@ export function IconBtn({ children, className, variant = "glass", size = "md", .
     <button
       {...rest}
       className={cn(
-        "press tap-ring grid place-items-center rounded-full",
+        "press tap-ring grid place-items-center rounded-2xl",
         sz,
         variant === "glass" && "glass text-foreground hover:text-primary",
         variant === "ghost" && "text-muted-foreground hover:bg-primary-soft hover:text-primary transition-colors",
-        variant === "solid" && "btn-primary-gradient text-white",
+        variant === "solid" && "btn-primary-gradient text-primary-foreground",
         className,
       )}
     >

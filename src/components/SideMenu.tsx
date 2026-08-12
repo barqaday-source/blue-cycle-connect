@@ -52,26 +52,26 @@ export function SideMenu() {
       <SheetTrigger asChild>
         <button
           aria-label="القائمة"
-          className="press tap-ring glass grid h-11 w-11 place-items-center rounded-full text-foreground"
+          className="press tap-ring glass grid h-11 w-11 place-items-center rounded-2xl text-foreground"
         >
           <Menu size={20} strokeWidth={1.75} />
         </button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[88%] max-w-[340px] p-0">
+      <SheetContent side="right" className="w-[88%] max-w-[340px] border-primary/10 bg-background p-0">
         <SheetHeader className="p-0">
           <SheetTitle className="sr-only">القائمة</SheetTitle>
         </SheetHeader>
         <div className="flex h-full flex-col">
-          <div className="btn-primary-gradient p-5 text-white">
+          <div className="border-b border-primary/10 p-5">
             <div className="flex items-center gap-3">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white/20">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary-soft text-primary">
                 <Recycle size={24} />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-base font-extrabold">
+                <p className="truncate text-base font-extrabold text-foreground">
                   {profile?.company_name || profile?.full_name || "تدوير بلو"}
                 </p>
-                <p className="truncate text-[11px] opacity-90">{user?.email}</p>
+                <p className="truncate text-[11px] text-muted-foreground">{user?.email}</p>
               </div>
             </div>
           </div>

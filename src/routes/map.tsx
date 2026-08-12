@@ -129,14 +129,14 @@ function MapPage() {
     <>
       <AppHeader
         back={
-          <Link to="/" aria-label="رجوع" className="grid h-11 w-11 place-items-center rounded-full bg-surface text-foreground shadow-[0_4px_14px_-4px_oklch(0.6_0.15_250/0.25)] transition active:scale-90">
+          <Link to="/" aria-label="رجوع" className="glass press grid h-11 w-11 place-items-center rounded-2xl press text-foreground">
             <ArrowRight size={18} />
           </Link>
         }
         title="الخريطة"
         subtitle="مواطنون وشركات قريبة"
         right={
-          <button onClick={locate} aria-label="موقعي" className="grid h-11 w-11 place-items-center rounded-full bg-primary/10 text-primary active:scale-90">
+          <button onClick={locate} aria-label="موقعي" className="glass press grid h-11 w-11 place-items-center rounded-2xl text-primary">
             <Locate size={18} />
           </button>
         }
