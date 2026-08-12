@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-export type AppRole = "admin" | "company" | "citizen";
+export type AppRole = "admin" | "company" | "collector" | "citizen";
 export const ADMIN_EMAIL = "barqaday@gmail.com";
 
 export interface Profile {
@@ -25,6 +25,7 @@ interface AuthState {
   loading: boolean;
   isAdmin: boolean;
   isCompany: boolean;
+  isCollector: boolean;
   isCitizen: boolean;
   signOut: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -78,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading,
     isAdmin: roles.includes("admin") || session?.user?.email?.toLowerCase() === ADMIN_EMAIL,
     isCompany: roles.includes("company"),
+    isCollector: roles.includes("collector"),
     isCitizen: roles.includes("citizen"),
     signOut: async () => {
       await supabase.auth.signOut();
