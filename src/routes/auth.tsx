@@ -200,7 +200,7 @@ function AuthPage() {
           <button
             onClick={googleSignIn}
             disabled={gbusy}
-            className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl border bg-white text-[13px] font-extrabold disabled:opacity-60"
+            className="flex h-[52px] w-full items-center justify-center gap-2 rounded-3xl border bg-white text-[13px] font-extrabold transition active:scale-[0.98] disabled:opacity-60"
             style={{ borderColor: `${BLUE}33`, color: INK }}
           >
             {gbusy ? <Loader2 className="animate-spin" size={16} /> : <GoogleIcon />}
@@ -232,8 +232,8 @@ function AuthPage() {
           <button
             onClick={submit}
             disabled={busy}
-            className="mt-1 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl text-[14px] font-extrabold text-white transition active:scale-[0.98] disabled:opacity-60"
-            style={{ background: BLUE, boxShadow: "0 10px 22px -10px rgba(30,99,255,0.55)" }}
+            className="mt-1 inline-flex h-[56px] w-full items-center justify-center gap-2 rounded-3xl text-[14px] font-extrabold text-white transition active:scale-[0.98] disabled:opacity-60"
+            style={{ background: BLUE, boxShadow: "0 18px 40px -14px rgba(30,99,255,0.55)" }}
           >
             {busy && <Loader2 className="animate-spin" size={16} />}
             {mode === "signin" ? t.submitIn : t.submitUp}
@@ -252,7 +252,7 @@ function Field({ icon, label, value, onChange, type = "text", dir, placeholder }
   return (
     <label className="flex flex-col gap-1">
       <span className="px-1 text-[10px] font-bold" style={{ color: `${BLUE}B3` }}>{label}</span>
-      <div className="flex h-11 items-center gap-2 rounded-2xl px-4" style={{ background: SOFT }}>
+      <div className="flex h-[52px] items-center gap-2 rounded-3xl px-4" style={{ background: SOFT, border: `1px solid ${BLUE}14` }}>
         <input
           type={type}
           dir={dir}
@@ -272,7 +272,7 @@ function RoleCard({ active, onClick, icon, label }: { active: boolean; onClick: 
   return (
     <button
       onClick={onClick}
-      className="flex h-10 items-center justify-center gap-1.5 rounded-2xl text-[12px] font-extrabold transition"
+      className="flex h-12 items-center justify-center gap-1.5 rounded-3xl text-[12px] font-extrabold transition active:scale-[0.98]"
       style={active ? { background: BLUE, color: "#fff" } : { background: SOFT, color: BLUE }}
     >
       {icon}{label}
