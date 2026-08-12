@@ -176,71 +176,80 @@ function AuthPage() {
         </div>
       </section>
 
-      {/* Tabs */}
-      <section className="relative z-10 px-5">
-        <div className="grid grid-cols-2 gap-1 rounded-3xl p-1"
-             style={{ background: SOFT, border: `1px solid ${BLUE}1F` }}>
-          {(["signin", "signup"] as Mode[]).map((m) => {
-            const active = mode === m;
-            return (
-              <button
-                key={m}
-                onClick={() => setMode(m)}
-                className="h-11 rounded-[20px] text-[13px] font-extrabold transition active:scale-[0.98]"
-                style={active ? { background: BLUE, color: "#fff", boxShadow: "0 10px 22px -12px rgba(30,99,255,0.6)" } : { color: `${BLUE}B3` }}
-              >
-                {m === "signin" ? t.signin : t.signup}
-              </button>
-            );
-          })}
-        </div>
-
-
-        <div className="mt-4 flex flex-col gap-3">
-          <button
-            onClick={googleSignIn}
-            disabled={gbusy}
-            className="flex h-[52px] w-full items-center justify-center gap-2 rounded-3xl border bg-white text-[13px] font-extrabold transition active:scale-[0.98] disabled:opacity-60"
-            style={{ borderColor: `${BLUE}33`, color: INK }}
-          >
-            {gbusy ? <Loader2 className="animate-spin" size={16} /> : <GoogleIcon />}
-            {t.google}
-          </button>
-
-          <div className="flex items-center gap-2">
-            <span className="h-px flex-1" style={{ background: `${BLUE}33` }} />
-            <span className="text-[10px] font-bold" style={{ color: `${BLUE}99` }}>{t.or}</span>
-            <span className="h-px flex-1" style={{ background: `${BLUE}33` }} />
+      {/* Card */}
+      <section className="relative z-10 px-5 pb-10">
+        <div
+          className="rounded-[32px] p-4"
+          style={{
+            background: "rgba(255,255,255,0.72)",
+            border: `1px solid ${BLUE}1F`,
+            backdropFilter: "blur(14px)",
+            boxShadow: "0 22px 50px -28px rgba(13,42,102,0.45)",
+          }}
+        >
+          <div className="grid grid-cols-2 gap-1.5 rounded-3xl p-1.5"
+               style={{ background: SOFT }}>
+            {(["signin", "signup"] as Mode[]).map((m) => {
+              const active = mode === m;
+              return (
+                <button
+                  key={m}
+                  onClick={() => setMode(m)}
+                  className="h-12 rounded-[22px] text-[13px] font-extrabold transition active:scale-[0.98]"
+                  style={active ? { background: BLUE, color: "#fff", boxShadow: "0 12px 24px -14px rgba(30,99,255,0.7)" } : { color: `${BLUE}B3` }}
+                >
+                  {m === "signin" ? t.signin : t.signup}
+                </button>
+              );
+            })}
           </div>
 
-          {mode === "signup" && (
-            <>
-              <div className="grid grid-cols-2 gap-2">
-                <RoleCard active={role === "citizen"} onClick={() => setRole("citizen")} icon={<User size={14} />} label={t.roleCitizen} />
-                <RoleCard active={role === "company"} onClick={() => setRole("company")} icon={<Building2 size={14} />} label={t.roleCompany} />
-              </div>
-              <Field label={t.name} icon={<User size={16} />} value={name} onChange={setName} />
-              {role === "company" && (
-                <Field label={t.company} icon={<Building2 size={16} />} value={company} onChange={setCompany} />
-              )}
-            </>
-          )}
+          <div className="mt-5 flex flex-col gap-4">
+            <button
+              onClick={googleSignIn}
+              disabled={gbusy}
+              className="flex h-[54px] w-full items-center justify-center gap-2 rounded-3xl text-[13px] font-extrabold transition active:scale-[0.98] disabled:opacity-60"
+              style={{ background: "rgba(30,99,255,0.05)", border: `1px solid ${BLUE}29`, color: INK, backdropFilter: "blur(8px)" }}
+            >
+              {gbusy ? <Loader2 className="animate-spin" size={16} /> : <GoogleIcon />}
+              {t.google}
+            </button>
 
-          <Field label={t.email} icon={<Mail size={16} />} value={email} onChange={setEmail} type="email" dir="ltr" placeholder="you@example.com" />
-          <Field label={t.password} icon={<Lock size={16} />} value={password} onChange={setPassword} type="password" dir="ltr" placeholder="••••••" />
+            <div className="flex items-center gap-3">
+              <span className="h-px flex-1" style={{ background: `${BLUE}26` }} />
+              <span className="text-[10px] font-bold" style={{ color: `${BLUE}99` }}>{t.or}</span>
+              <span className="h-px flex-1" style={{ background: `${BLUE}26` }} />
+            </div>
 
-          <button
-            onClick={submit}
-            disabled={busy}
-            className="mt-1 inline-flex h-[56px] w-full items-center justify-center gap-2 rounded-3xl text-[14px] font-extrabold text-white transition active:scale-[0.98] disabled:opacity-60"
-            style={{ background: BLUE, boxShadow: "0 18px 40px -14px rgba(30,99,255,0.55)" }}
-          >
-            {busy && <Loader2 className="animate-spin" size={16} />}
-            {mode === "signin" ? t.submitIn : t.submitUp}
-          </button>
-          <div className="h-6" />
+            {mode === "signup" && (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <RoleCard active={role === "citizen"} onClick={() => setRole("citizen")} icon={<User size={14} />} label={t.roleCitizen} />
+                  <RoleCard active={role === "company"} onClick={() => setRole("company")} icon={<Building2 size={14} />} label={t.roleCompany} />
+                </div>
+                <Field label={t.name} icon={<User size={16} />} value={name} onChange={setName} />
+                {role === "company" && (
+                  <Field label={t.company} icon={<Building2 size={16} />} value={company} onChange={setCompany} />
+                )}
+              </>
+            )}
+
+            <Field label={t.email} icon={<Mail size={16} />} value={email} onChange={setEmail} type="email" dir="ltr" placeholder="you@example.com" />
+            <Field label={t.password} icon={<Lock size={16} />} value={password} onChange={setPassword} type="password" dir="ltr" placeholder="••••••" />
+
+            <button
+              onClick={submit}
+              disabled={busy}
+              className="mt-2 inline-flex h-[58px] w-full items-center justify-center gap-2 rounded-3xl text-[14px] font-extrabold text-white transition active:scale-[0.98] disabled:opacity-60"
+              style={{ background: BLUE, boxShadow: "0 18px 40px -14px rgba(30,99,255,0.55)" }}
+            >
+              {busy && <Loader2 className="animate-spin" size={16} />}
+              {mode === "signin" ? t.submitIn : t.submitUp}
+            </button>
+          </div>
         </div>
       </section>
+
     </main>
   );
 }
