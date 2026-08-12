@@ -18,7 +18,7 @@ export function BottomNav({ items, activePath, centerAction }: Props) {
   const right = items.slice(2, 4);
   return (
     <nav className="fixed bottom-4 left-1/2 z-40 w-[min(440px,calc(100%-1.5rem))] -translate-x-1/2 float-in">
-      <div className="glass-strong flex h-[68px] items-center justify-between rounded-full px-3">
+      <div className="glass-strong flex h-[70px] items-center justify-between rounded-[28px] px-3">
         <div className="flex flex-1 items-center justify-around">
           {left.map((it) => (
             <NavLink key={it.to} item={it} active={activePath === it.to} />
