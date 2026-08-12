@@ -55,7 +55,7 @@ function AdminPage() {
   return (
     <div className="mx-auto min-h-screen w-full max-w-[460px] px-4 pb-10">
       <AppHeader
-        back={<Link to="/" aria-label="رجوع" className="grid h-11 w-11 place-items-center rounded-full bg-surface text-foreground shadow-[0_4px_14px_-4px_oklch(0.6_0.15_250/0.25)] transition active:scale-90"><ArrowRight size={18} /></Link>}
+        back={<Link to="/" aria-label="رجوع" className="glass press grid h-11 w-11 place-items-center rounded-2xl press text-foreground"><ArrowRight size={18} /></Link>}
         title="لوحة المدير"
         subtitle="تدوير بلو"
         right={<div className="grid h-11 w-11 place-items-center rounded-full bg-warning/15"><ShieldCheck size={18} className="text-warning" /></div>}

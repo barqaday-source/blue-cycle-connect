@@ -28,7 +28,7 @@ export function BottomNav({ items, activePath, centerAction }: Props) {
           <Link
             to={centerAction.to}
             aria-label={centerAction.label}
-            className="btn-primary-gradient press tap-ring -mt-8 grid h-16 w-16 shrink-0 place-items-center rounded-full ring-4 ring-background/70"
+            className="btn-primary-gradient press tap-ring -mt-8 grid h-16 w-16 shrink-0 place-items-center rounded-[24px] ring-4 ring-background"
           >
             <span className="text-white">{centerAction.icon}</span>
           </Link>

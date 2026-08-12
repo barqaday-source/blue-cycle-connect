@@ -48,7 +48,7 @@ function EditAccount() {
     <>
       <AppHeader
         back={
-          <Link to={backTo} className="grid h-11 w-11 place-items-center rounded-full bg-surface text-foreground shadow-[0_4px_14px_-4px_oklch(0.6_0.15_250/0.25)] transition active:scale-90">
+          <Link to={backTo} className="glass press grid h-11 w-11 place-items-center rounded-2xl press text-foreground">
             <ArrowRight size={18} />
           </Link>
         }
