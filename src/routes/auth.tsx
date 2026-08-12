@@ -143,7 +143,7 @@ function AuthPage() {
       />
 
       {/* Hero */}
-      <section className="relative z-10 px-5 pb-6 pt-5">
+      <section className="relative z-10 px-5 pb-7 pt-6">
         <div
           className="inline-flex items-center gap-1 rounded-2xl p-1"
           style={{ background: SOFT, border: `1px solid ${BLUE}1F` }}
@@ -259,7 +259,7 @@ function Field({ icon, label, value, onChange, type = "text", dir, placeholder }
   type?: string; dir?: "ltr" | "rtl"; placeholder?: string;
 }) {
   return (
-    <label className="flex flex-col gap-1">
+    <label className="flex flex-col gap-1.5">
       <span className="px-1 text-[10px] font-bold" style={{ color: `${BLUE}B3` }}>{label}</span>
       <div className="flex h-[52px] items-center gap-2 rounded-3xl px-4" style={{ background: SOFT, border: `1px solid ${BLUE}14` }}>
         <input
