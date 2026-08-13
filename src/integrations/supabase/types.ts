@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      collector_links: {
+        Row: {
+          collector_id: string
+          company_id: string
+          created_at: string
+          id: string
+          note: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          collector_id: string
+          company_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          collector_id?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       company_ads: {
         Row: {
           active: boolean
