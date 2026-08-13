@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Building2, ChevronLeft, LogOut, MapPin, MessageCircle, Recycle, Truck } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
+import { AvatarUpload } from "@/components/AvatarUpload";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
