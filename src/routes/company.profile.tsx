@@ -26,9 +26,7 @@ function CompanyProfile() {
     <>
       <AppHeader title="حساب الشركة" subtitle="تدوير بلو" />
       <div className="glass-card flex items-center gap-4 rounded-3xl p-5">
-        <div className="grid h-16 w-16 place-items-center rounded-2xl bg-primary-soft text-2xl font-extrabold text-primary">
-          {(profile?.company_name?.[0] ?? profile?.full_name?.[0] ?? "ش").toUpperCase()}
-        </div>
+        <AvatarUpload size={64} fallback={(profile?.company_name?.[0] ?? profile?.full_name?.[0] ?? "ش").toUpperCase()} />
         <div className="min-w-0 flex-1">
           <p className="truncate text-base font-extrabold">{profile?.company_name ?? profile?.full_name ?? "شركة تدوير"}</p>
           <p className="truncate text-[12px] text-muted-foreground">{profile?.phone ?? user?.email}</p>
