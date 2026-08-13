@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Building2, ChevronLeft, LogOut, MapPin, MessageCircle, Recycle, Truck } from "lucide-react";
+import { Users, Building2, ChevronLeft, LogOut, MapPin, MessageCircle, Recycle, Truck } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { AvatarUpload } from "@/components/AvatarUpload";
 import { useAuth } from "@/lib/auth";
@@ -18,6 +18,7 @@ function CompanyProfile() {
   type Item = { Icon: typeof Building2; t: string; to?: string; href?: string; action?: () => void };
   const items: Item[] = [
     { Icon: Building2, t: "بيانات المعمل", to: "/account/edit" },
+    { Icon: Users, t: "المجمعون التابعون لنا", to: "/company/collectors" },
     { Icon: Recycle, t: "أنواع المواد التي نشتريها", to: "/company/ads" },
     { Icon: MapPin, t: "نطاق المحافظات المغطاة", to: "/account/address" },
     { Icon: Truck, t: "السائقون والآليات", action: () => toast.message("قريباً — إدارة السائقين") },
