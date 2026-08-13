@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Bell, ChevronLeft, FileText, LogOut, MapPin, MessageCircle, ShieldCheck, User } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
+import { AvatarUpload } from "@/components/AvatarUpload";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/citizen/profile")({
