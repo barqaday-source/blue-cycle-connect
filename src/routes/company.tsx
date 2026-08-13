@@ -25,7 +25,7 @@ function CompanyLayout() {
         items={[
           { to: "/company/feed", label: "الشحنات", icon: <ClipboardList size={20} /> },
           { to: "/company/ads", label: "إعلاناتي", icon: <Megaphone size={20} /> },
-          { to: "/company/stats", label: "تقاريري", icon: <BarChart3 size={20} /> },
+          { to: "/company/collectors", label: "المجمعون", icon: <Users size={20} /> },
           { to: "/company/profile", label: "حسابي", icon: <User size={20} /> },
         ]}
       />
