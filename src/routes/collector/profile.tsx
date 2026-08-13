@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
+import { AvatarUpload } from "@/components/AvatarUpload";
 import { Phone, Mail, MapPin, LogOut, Edit2, Award, TrendingUp } from "lucide-react";
 
 export const Route = createFileRoute("/collector/profile")({
@@ -32,12 +33,7 @@ function CollectorProfile() {
       {/* Profile Header */}
       <section className="mb-8 rounded-3xl p-6 text-center" style={{ background: SOFT, border: `2px solid ${BLUE}14` }}>
         <div className="mb-4 flex justify-center">
-          <div
-            className="h-20 w-20 rounded-full flex items-center justify-center text-4xl font-bold"
-            style={{ background: BLUE, color: "#fff" }}
-          >
-            {profile?.full_name?.charAt(0) || "👤"}
-          </div>
+          <AvatarUpload size={80} fallback={profile?.full_name?.charAt(0) || "م"} />
         </div>
         <h1 className="text-[22px] font-black" style={{ color: INK }}>
           {profile?.full_name || "المستخدم"}

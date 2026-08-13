@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Home, Phone, Zap, User, MapPin } from "lucide-react";
+import { Home, Map, Zap, User, Building2 } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { useAuth } from "@/lib/auth";
 
@@ -24,11 +24,11 @@ function CollectorLayout() {
       <Outlet />
       <BottomNav
         activePath={pathname}
-        centerAction={{ to: "/collector/contact", icon: <Phone size={26} />, label: "اتصالات" }}
+        centerAction={{ to: "/map", icon: <Map size={26} />, label: "الخريطة" }}
         items={[
           { to: "/collector", label: "الرئيسية", icon: <Home size={20} /> },
           { to: "/collector/opportunities", label: "الفرص", icon: <Zap size={20} /> },
-          { to: "/collector/map", label: "الخريطة", icon: <MapPin size={20} /> },
+          { to: "/collector/join", label: "شركتي", icon: <Building2 size={20} /> },
           { to: "/collector/profile", label: "حسابي", icon: <User size={20} /> },
         ]}
       />

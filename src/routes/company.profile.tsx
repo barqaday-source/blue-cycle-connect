@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Building2, ChevronLeft, LogOut, MapPin, MessageCircle, Recycle, Truck } from "lucide-react";
+import { Users, Building2, ChevronLeft, LogOut, MapPin, MessageCircle, Recycle, Truck } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
+import { AvatarUpload } from "@/components/AvatarUpload";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
@@ -17,6 +18,7 @@ function CompanyProfile() {
   type Item = { Icon: typeof Building2; t: string; to?: string; href?: string; action?: () => void };
   const items: Item[] = [
     { Icon: Building2, t: "بيانات المعمل", to: "/account/edit" },
+    { Icon: Users, t: "المجمعون التابعون لنا", to: "/company/collectors" },
     { Icon: Recycle, t: "أنواع المواد التي نشتريها", to: "/company/ads" },
     { Icon: MapPin, t: "نطاق المحافظات المغطاة", to: "/account/address" },
     { Icon: Truck, t: "السائقون والآليات", action: () => toast.message("قريباً — إدارة السائقين") },
@@ -26,9 +28,7 @@ function CompanyProfile() {
     <>
       <AppHeader title="حساب الشركة" subtitle="تدوير بلو" />
       <div className="glass-card flex items-center gap-4 rounded-3xl p-5">
-        <div className="grid h-16 w-16 place-items-center rounded-2xl bg-primary-soft text-2xl font-extrabold text-primary">
-          {(profile?.company_name?.[0] ?? profile?.full_name?.[0] ?? "ش").toUpperCase()}
-        </div>
+        <AvatarUpload size={64} fallback={(profile?.company_name?.[0] ?? profile?.full_name?.[0] ?? "ش").toUpperCase()} />
         <div className="min-w-0 flex-1">
           <p className="truncate text-base font-extrabold">{profile?.company_name ?? profile?.full_name ?? "شركة تدوير"}</p>
           <p className="truncate text-[12px] text-muted-foreground">{profile?.phone ?? user?.email}</p>

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Bell, Camera, ChevronLeft, Map as MapIcon, MapPin, Megaphone, TrendingUp } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
+import { AdsSlider } from "@/components/AdsSlider";
 import { IconBtn } from "@/components/IconBtn";
 import { MATERIALS, statusMeta, timeAgo, type ShipmentRow } from "@/lib/tadweer-data";
 import { supabase } from "@/integrations/supabase/client";
@@ -97,6 +98,7 @@ function CitizenHome() {
         <ChevronLeft size={18} className="text-primary" />
       </Link>
 
+      <AdsSlider />
 
 
       <section className="mt-8">
