@@ -27,6 +27,7 @@ import { Route as CompanyFeedRouteImport } from './routes/company.feed'
 import { Route as CompanyAdsRouteImport } from './routes/company.ads'
 import { Route as CollectorProfileRouteImport } from './routes/collector/profile'
 import { Route as CollectorOpportunitiesRouteImport } from './routes/collector/opportunities'
+import { Route as CollectorJoinRouteImport } from './routes/collector/join'
 import { Route as CitizenWalletRouteImport } from './routes/citizen.wallet'
 import { Route as CitizenShipmentsRouteImport } from './routes/citizen.shipments'
 import { Route as CitizenProfileRouteImport } from './routes/citizen.profile'
@@ -127,6 +128,11 @@ const CollectorOpportunitiesRoute = CollectorOpportunitiesRouteImport.update({
   path: '/opportunities',
   getParentRoute: () => CollectorRoute,
 } as any)
+const CollectorJoinRoute = CollectorJoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => CollectorRoute,
+} as any)
 const CitizenWalletRoute = CitizenWalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/citizen/profile': typeof CitizenProfileRoute
   '/citizen/shipments': typeof CitizenShipmentsRoute
   '/citizen/wallet': typeof CitizenWalletRoute
+  '/collector/join': typeof CollectorJoinRoute
   '/collector/opportunities': typeof CollectorOpportunitiesRoute
   '/collector/profile': typeof CollectorProfileRoute
   '/company/ads': typeof CompanyAdsRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/citizen/profile': typeof CitizenProfileRoute
   '/citizen/shipments': typeof CitizenShipmentsRoute
   '/citizen/wallet': typeof CitizenWalletRoute
+  '/collector/join': typeof CollectorJoinRoute
   '/collector/opportunities': typeof CollectorOpportunitiesRoute
   '/collector/profile': typeof CollectorProfileRoute
   '/company/ads': typeof CompanyAdsRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/citizen/profile': typeof CitizenProfileRoute
   '/citizen/shipments': typeof CitizenShipmentsRoute
   '/citizen/wallet': typeof CitizenWalletRoute
+  '/collector/join': typeof CollectorJoinRoute
   '/collector/opportunities': typeof CollectorOpportunitiesRoute
   '/collector/profile': typeof CollectorProfileRoute
   '/company/ads': typeof CompanyAdsRoute
@@ -278,6 +287,7 @@ export interface FileRouteTypes {
     | '/citizen/profile'
     | '/citizen/shipments'
     | '/citizen/wallet'
+    | '/collector/join'
     | '/collector/opportunities'
     | '/collector/profile'
     | '/company/ads'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/citizen/profile'
     | '/citizen/shipments'
     | '/citizen/wallet'
+    | '/collector/join'
     | '/collector/opportunities'
     | '/collector/profile'
     | '/company/ads'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/citizen/profile'
     | '/citizen/shipments'
     | '/citizen/wallet'
+    | '/collector/join'
     | '/collector/opportunities'
     | '/collector/profile'
     | '/company/ads'
@@ -488,6 +500,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CollectorOpportunitiesRouteImport
       parentRoute: typeof CollectorRoute
     }
+    '/collector/join': {
+      id: '/collector/join'
+      path: '/join'
+      fullPath: '/collector/join'
+      preLoaderRoute: typeof CollectorJoinRouteImport
+      parentRoute: typeof CollectorRoute
+    }
     '/citizen/wallet': {
       id: '/citizen/wallet'
       path: '/wallet'
@@ -576,12 +595,14 @@ const CitizenRouteWithChildren =
   CitizenRoute._addFileChildren(CitizenRouteChildren)
 
 interface CollectorRouteChildren {
+  CollectorJoinRoute: typeof CollectorJoinRoute
   CollectorOpportunitiesRoute: typeof CollectorOpportunitiesRoute
   CollectorProfileRoute: typeof CollectorProfileRoute
   CollectorIndexRoute: typeof CollectorIndexRoute
 }
 
 const CollectorRouteChildren: CollectorRouteChildren = {
+  CollectorJoinRoute: CollectorJoinRoute,
   CollectorOpportunitiesRoute: CollectorOpportunitiesRoute,
   CollectorProfileRoute: CollectorProfileRoute,
   CollectorIndexRoute: CollectorIndexRoute,
