@@ -24,9 +24,7 @@ function Profile() {
     <>
       <AppHeader title="حسابي" subtitle="تدوير بلو" />
       <div className="glass-card flex items-center gap-4 rounded-3xl p-5">
-        <div className="grid h-16 w-16 place-items-center rounded-2xl bg-primary-soft text-2xl font-extrabold text-primary">
-          {(profile?.full_name?.trim()?.[0] ?? "ت").toUpperCase()}
-        </div>
+        <AvatarUpload size={64} fallback={(profile?.full_name?.trim()?.[0] ?? "ت").toUpperCase()} />
         <div className="min-w-0 flex-1">
           <p className="truncate text-base font-extrabold">{profile?.full_name || "مستخدم تدوير بلو"}</p>
           <p className="truncate text-[12px] text-muted-foreground">{profile?.phone ?? user?.email}</p>
