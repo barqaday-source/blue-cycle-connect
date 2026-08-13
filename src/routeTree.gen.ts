@@ -12,21 +12,26 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PricesRouteImport } from './routes/prices'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as CompanyRouteImport } from './routes/company'
+import { Route as CollectorRouteImport } from './routes/collector'
 import { Route as CitizenRouteImport } from './routes/citizen'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CompanyIndexRouteImport } from './routes/company.index'
+import { Route as CollectorIndexRouteImport } from './routes/collector/index'
 import { Route as CitizenIndexRouteImport } from './routes/citizen.index'
 import { Route as CompanyStatsRouteImport } from './routes/company.stats'
 import { Route as CompanyProfileRouteImport } from './routes/company.profile'
 import { Route as CompanyOrdersRouteImport } from './routes/company.orders'
 import { Route as CompanyFeedRouteImport } from './routes/company.feed'
 import { Route as CompanyAdsRouteImport } from './routes/company.ads'
+import { Route as CollectorProfileRouteImport } from './routes/collector/profile'
+import { Route as CollectorOpportunitiesRouteImport } from './routes/collector/opportunities'
 import { Route as CitizenWalletRouteImport } from './routes/citizen.wallet'
 import { Route as CitizenShipmentsRouteImport } from './routes/citizen.shipments'
 import { Route as CitizenProfileRouteImport } from './routes/citizen.profile'
 import { Route as CitizenNewRouteImport } from './routes/citizen.new'
+import { Route as CitizenDirectoryRouteImport } from './routes/citizen/directory'
 import { Route as AccountPrivacyRouteImport } from './routes/account.privacy'
 import { Route as AccountNotificationsRouteImport } from './routes/account.notifications'
 import { Route as AccountEditRouteImport } from './routes/account.edit'
@@ -45,6 +50,11 @@ const MapRoute = MapRouteImport.update({
 const CompanyRoute = CompanyRouteImport.update({
   id: '/company',
   path: '/company',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectorRoute = CollectorRouteImport.update({
+  id: '/collector',
+  path: '/collector',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CitizenRoute = CitizenRouteImport.update({
@@ -71,6 +81,11 @@ const CompanyIndexRoute = CompanyIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => CompanyRoute,
+} as any)
+const CollectorIndexRoute = CollectorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CollectorRoute,
 } as any)
 const CitizenIndexRoute = CitizenIndexRouteImport.update({
   id: '/',
@@ -102,6 +117,16 @@ const CompanyAdsRoute = CompanyAdsRouteImport.update({
   path: '/ads',
   getParentRoute: () => CompanyRoute,
 } as any)
+const CollectorProfileRoute = CollectorProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => CollectorRoute,
+} as any)
+const CollectorOpportunitiesRoute = CollectorOpportunitiesRouteImport.update({
+  id: '/opportunities',
+  path: '/opportunities',
+  getParentRoute: () => CollectorRoute,
+} as any)
 const CitizenWalletRoute = CitizenWalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -120,6 +145,11 @@ const CitizenProfileRoute = CitizenProfileRouteImport.update({
 const CitizenNewRoute = CitizenNewRouteImport.update({
   id: '/new',
   path: '/new',
+  getParentRoute: () => CitizenRoute,
+} as any)
+const CitizenDirectoryRoute = CitizenDirectoryRouteImport.update({
+  id: '/directory',
+  path: '/directory',
   getParentRoute: () => CitizenRoute,
 } as any)
 const AccountPrivacyRoute = AccountPrivacyRouteImport.update({
@@ -148,6 +178,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/citizen': typeof CitizenRouteWithChildren
+  '/collector': typeof CollectorRouteWithChildren
   '/company': typeof CompanyRouteWithChildren
   '/map': typeof MapRoute
   '/prices': typeof PricesRoute
@@ -155,16 +186,20 @@ export interface FileRoutesByFullPath {
   '/account/edit': typeof AccountEditRoute
   '/account/notifications': typeof AccountNotificationsRoute
   '/account/privacy': typeof AccountPrivacyRoute
+  '/citizen/directory': typeof CitizenDirectoryRoute
   '/citizen/new': typeof CitizenNewRoute
   '/citizen/profile': typeof CitizenProfileRoute
   '/citizen/shipments': typeof CitizenShipmentsRoute
   '/citizen/wallet': typeof CitizenWalletRoute
+  '/collector/opportunities': typeof CollectorOpportunitiesRoute
+  '/collector/profile': typeof CollectorProfileRoute
   '/company/ads': typeof CompanyAdsRoute
   '/company/feed': typeof CompanyFeedRoute
   '/company/orders': typeof CompanyOrdersRoute
   '/company/profile': typeof CompanyProfileRoute
   '/company/stats': typeof CompanyStatsRoute
   '/citizen/': typeof CitizenIndexRoute
+  '/collector/': typeof CollectorIndexRoute
   '/company/': typeof CompanyIndexRoute
 }
 export interface FileRoutesByTo {
@@ -177,16 +212,20 @@ export interface FileRoutesByTo {
   '/account/edit': typeof AccountEditRoute
   '/account/notifications': typeof AccountNotificationsRoute
   '/account/privacy': typeof AccountPrivacyRoute
+  '/citizen/directory': typeof CitizenDirectoryRoute
   '/citizen/new': typeof CitizenNewRoute
   '/citizen/profile': typeof CitizenProfileRoute
   '/citizen/shipments': typeof CitizenShipmentsRoute
   '/citizen/wallet': typeof CitizenWalletRoute
+  '/collector/opportunities': typeof CollectorOpportunitiesRoute
+  '/collector/profile': typeof CollectorProfileRoute
   '/company/ads': typeof CompanyAdsRoute
   '/company/feed': typeof CompanyFeedRoute
   '/company/orders': typeof CompanyOrdersRoute
   '/company/profile': typeof CompanyProfileRoute
   '/company/stats': typeof CompanyStatsRoute
   '/citizen': typeof CitizenIndexRoute
+  '/collector': typeof CollectorIndexRoute
   '/company': typeof CompanyIndexRoute
 }
 export interface FileRoutesById {
@@ -195,6 +234,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/citizen': typeof CitizenRouteWithChildren
+  '/collector': typeof CollectorRouteWithChildren
   '/company': typeof CompanyRouteWithChildren
   '/map': typeof MapRoute
   '/prices': typeof PricesRoute
@@ -202,16 +242,20 @@ export interface FileRoutesById {
   '/account/edit': typeof AccountEditRoute
   '/account/notifications': typeof AccountNotificationsRoute
   '/account/privacy': typeof AccountPrivacyRoute
+  '/citizen/directory': typeof CitizenDirectoryRoute
   '/citizen/new': typeof CitizenNewRoute
   '/citizen/profile': typeof CitizenProfileRoute
   '/citizen/shipments': typeof CitizenShipmentsRoute
   '/citizen/wallet': typeof CitizenWalletRoute
+  '/collector/opportunities': typeof CollectorOpportunitiesRoute
+  '/collector/profile': typeof CollectorProfileRoute
   '/company/ads': typeof CompanyAdsRoute
   '/company/feed': typeof CompanyFeedRoute
   '/company/orders': typeof CompanyOrdersRoute
   '/company/profile': typeof CompanyProfileRoute
   '/company/stats': typeof CompanyStatsRoute
   '/citizen/': typeof CitizenIndexRoute
+  '/collector/': typeof CollectorIndexRoute
   '/company/': typeof CompanyIndexRoute
 }
 export interface FileRouteTypes {
@@ -221,6 +265,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/citizen'
+    | '/collector'
     | '/company'
     | '/map'
     | '/prices'
@@ -228,16 +273,20 @@ export interface FileRouteTypes {
     | '/account/edit'
     | '/account/notifications'
     | '/account/privacy'
+    | '/citizen/directory'
     | '/citizen/new'
     | '/citizen/profile'
     | '/citizen/shipments'
     | '/citizen/wallet'
+    | '/collector/opportunities'
+    | '/collector/profile'
     | '/company/ads'
     | '/company/feed'
     | '/company/orders'
     | '/company/profile'
     | '/company/stats'
     | '/citizen/'
+    | '/collector/'
     | '/company/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -250,16 +299,20 @@ export interface FileRouteTypes {
     | '/account/edit'
     | '/account/notifications'
     | '/account/privacy'
+    | '/citizen/directory'
     | '/citizen/new'
     | '/citizen/profile'
     | '/citizen/shipments'
     | '/citizen/wallet'
+    | '/collector/opportunities'
+    | '/collector/profile'
     | '/company/ads'
     | '/company/feed'
     | '/company/orders'
     | '/company/profile'
     | '/company/stats'
     | '/citizen'
+    | '/collector'
     | '/company'
   id:
     | '__root__'
@@ -267,6 +320,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/citizen'
+    | '/collector'
     | '/company'
     | '/map'
     | '/prices'
@@ -274,16 +328,20 @@ export interface FileRouteTypes {
     | '/account/edit'
     | '/account/notifications'
     | '/account/privacy'
+    | '/citizen/directory'
     | '/citizen/new'
     | '/citizen/profile'
     | '/citizen/shipments'
     | '/citizen/wallet'
+    | '/collector/opportunities'
+    | '/collector/profile'
     | '/company/ads'
     | '/company/feed'
     | '/company/orders'
     | '/company/profile'
     | '/company/stats'
     | '/citizen/'
+    | '/collector/'
     | '/company/'
   fileRoutesById: FileRoutesById
 }
@@ -292,6 +350,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   CitizenRoute: typeof CitizenRouteWithChildren
+  CollectorRoute: typeof CollectorRouteWithChildren
   CompanyRoute: typeof CompanyRouteWithChildren
   MapRoute: typeof MapRoute
   PricesRoute: typeof PricesRoute
@@ -322,6 +381,13 @@ declare module '@tanstack/react-router' {
       path: '/company'
       fullPath: '/company'
       preLoaderRoute: typeof CompanyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collector': {
+      id: '/collector'
+      path: '/collector'
+      fullPath: '/collector'
+      preLoaderRoute: typeof CollectorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/citizen': {
@@ -358,6 +424,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/company/'
       preLoaderRoute: typeof CompanyIndexRouteImport
       parentRoute: typeof CompanyRoute
+    }
+    '/collector/': {
+      id: '/collector/'
+      path: '/'
+      fullPath: '/collector/'
+      preLoaderRoute: typeof CollectorIndexRouteImport
+      parentRoute: typeof CollectorRoute
     }
     '/citizen/': {
       id: '/citizen/'
@@ -401,6 +474,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompanyAdsRouteImport
       parentRoute: typeof CompanyRoute
     }
+    '/collector/profile': {
+      id: '/collector/profile'
+      path: '/profile'
+      fullPath: '/collector/profile'
+      preLoaderRoute: typeof CollectorProfileRouteImport
+      parentRoute: typeof CollectorRoute
+    }
+    '/collector/opportunities': {
+      id: '/collector/opportunities'
+      path: '/opportunities'
+      fullPath: '/collector/opportunities'
+      preLoaderRoute: typeof CollectorOpportunitiesRouteImport
+      parentRoute: typeof CollectorRoute
+    }
     '/citizen/wallet': {
       id: '/citizen/wallet'
       path: '/wallet'
@@ -427,6 +514,13 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/citizen/new'
       preLoaderRoute: typeof CitizenNewRouteImport
+      parentRoute: typeof CitizenRoute
+    }
+    '/citizen/directory': {
+      id: '/citizen/directory'
+      path: '/directory'
+      fullPath: '/citizen/directory'
+      preLoaderRoute: typeof CitizenDirectoryRouteImport
       parentRoute: typeof CitizenRoute
     }
     '/account/privacy': {
@@ -461,6 +555,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface CitizenRouteChildren {
+  CitizenDirectoryRoute: typeof CitizenDirectoryRoute
   CitizenNewRoute: typeof CitizenNewRoute
   CitizenProfileRoute: typeof CitizenProfileRoute
   CitizenShipmentsRoute: typeof CitizenShipmentsRoute
@@ -469,6 +564,7 @@ interface CitizenRouteChildren {
 }
 
 const CitizenRouteChildren: CitizenRouteChildren = {
+  CitizenDirectoryRoute: CitizenDirectoryRoute,
   CitizenNewRoute: CitizenNewRoute,
   CitizenProfileRoute: CitizenProfileRoute,
   CitizenShipmentsRoute: CitizenShipmentsRoute,
@@ -478,6 +574,22 @@ const CitizenRouteChildren: CitizenRouteChildren = {
 
 const CitizenRouteWithChildren =
   CitizenRoute._addFileChildren(CitizenRouteChildren)
+
+interface CollectorRouteChildren {
+  CollectorOpportunitiesRoute: typeof CollectorOpportunitiesRoute
+  CollectorProfileRoute: typeof CollectorProfileRoute
+  CollectorIndexRoute: typeof CollectorIndexRoute
+}
+
+const CollectorRouteChildren: CollectorRouteChildren = {
+  CollectorOpportunitiesRoute: CollectorOpportunitiesRoute,
+  CollectorProfileRoute: CollectorProfileRoute,
+  CollectorIndexRoute: CollectorIndexRoute,
+}
+
+const CollectorRouteWithChildren = CollectorRoute._addFileChildren(
+  CollectorRouteChildren,
+)
 
 interface CompanyRouteChildren {
   CompanyAdsRoute: typeof CompanyAdsRoute
@@ -505,6 +617,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   CitizenRoute: CitizenRouteWithChildren,
+  CollectorRoute: CollectorRouteWithChildren,
   CompanyRoute: CompanyRouteWithChildren,
   MapRoute: MapRoute,
   PricesRoute: PricesRoute,
