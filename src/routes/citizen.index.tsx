@@ -97,6 +97,7 @@ function CitizenHome() {
         <ChevronLeft size={18} className="text-primary" />
       </Link>
 
+      <AdsSlider />
 
 
       <section className="mt-8">
