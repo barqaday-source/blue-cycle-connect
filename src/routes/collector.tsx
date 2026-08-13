@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Home, Phone, Zap, User, MapPin } from "lucide-react";
+import { Home, Map, Zap, User, Building2 } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { useAuth } from "@/lib/auth";
 
