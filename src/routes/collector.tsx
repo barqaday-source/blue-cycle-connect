@@ -24,11 +24,11 @@ function CollectorLayout() {
       <Outlet />
       <BottomNav
         activePath={pathname}
-        centerAction={{ to: "/collector/contact", icon: <Phone size={26} />, label: "اتصالات" }}
+        centerAction={{ to: "/map", icon: <Map size={26} />, label: "الخريطة" }}
         items={[
           { to: "/collector", label: "الرئيسية", icon: <Home size={20} /> },
           { to: "/collector/opportunities", label: "الفرص", icon: <Zap size={20} /> },
-          { to: "/collector/map", label: "الخريطة", icon: <MapPin size={20} /> },
+          { to: "/collector/join", label: "شركتي", icon: <Building2 size={20} /> },
           { to: "/collector/profile", label: "حسابي", icon: <User size={20} /> },
         ]}
       />
