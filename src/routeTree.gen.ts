@@ -24,6 +24,7 @@ import { Route as CompanyStatsRouteImport } from './routes/company.stats'
 import { Route as CompanyProfileRouteImport } from './routes/company.profile'
 import { Route as CompanyOrdersRouteImport } from './routes/company.orders'
 import { Route as CompanyFeedRouteImport } from './routes/company.feed'
+import { Route as CompanyCollectorsRouteImport } from './routes/company.collectors'
 import { Route as CompanyAdsRouteImport } from './routes/company.ads'
 import { Route as CollectorProfileRouteImport } from './routes/collector/profile'
 import { Route as CollectorOpportunitiesRouteImport } from './routes/collector/opportunities'
@@ -111,6 +112,11 @@ const CompanyOrdersRoute = CompanyOrdersRouteImport.update({
 const CompanyFeedRoute = CompanyFeedRouteImport.update({
   id: '/feed',
   path: '/feed',
+  getParentRoute: () => CompanyRoute,
+} as any)
+const CompanyCollectorsRoute = CompanyCollectorsRouteImport.update({
+  id: '/collectors',
+  path: '/collectors',
   getParentRoute: () => CompanyRoute,
 } as any)
 const CompanyAdsRoute = CompanyAdsRouteImport.update({
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/collector/opportunities': typeof CollectorOpportunitiesRoute
   '/collector/profile': typeof CollectorProfileRoute
   '/company/ads': typeof CompanyAdsRoute
+  '/company/collectors': typeof CompanyCollectorsRoute
   '/company/feed': typeof CompanyFeedRoute
   '/company/orders': typeof CompanyOrdersRoute
   '/company/profile': typeof CompanyProfileRoute
@@ -228,6 +235,7 @@ export interface FileRoutesByTo {
   '/collector/opportunities': typeof CollectorOpportunitiesRoute
   '/collector/profile': typeof CollectorProfileRoute
   '/company/ads': typeof CompanyAdsRoute
+  '/company/collectors': typeof CompanyCollectorsRoute
   '/company/feed': typeof CompanyFeedRoute
   '/company/orders': typeof CompanyOrdersRoute
   '/company/profile': typeof CompanyProfileRoute
@@ -259,6 +267,7 @@ export interface FileRoutesById {
   '/collector/opportunities': typeof CollectorOpportunitiesRoute
   '/collector/profile': typeof CollectorProfileRoute
   '/company/ads': typeof CompanyAdsRoute
+  '/company/collectors': typeof CompanyCollectorsRoute
   '/company/feed': typeof CompanyFeedRoute
   '/company/orders': typeof CompanyOrdersRoute
   '/company/profile': typeof CompanyProfileRoute
@@ -291,6 +300,7 @@ export interface FileRouteTypes {
     | '/collector/opportunities'
     | '/collector/profile'
     | '/company/ads'
+    | '/company/collectors'
     | '/company/feed'
     | '/company/orders'
     | '/company/profile'
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/collector/opportunities'
     | '/collector/profile'
     | '/company/ads'
+    | '/company/collectors'
     | '/company/feed'
     | '/company/orders'
     | '/company/profile'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/collector/opportunities'
     | '/collector/profile'
     | '/company/ads'
+    | '/company/collectors'
     | '/company/feed'
     | '/company/orders'
     | '/company/profile'
@@ -477,6 +489,13 @@ declare module '@tanstack/react-router' {
       path: '/feed'
       fullPath: '/company/feed'
       preLoaderRoute: typeof CompanyFeedRouteImport
+      parentRoute: typeof CompanyRoute
+    }
+    '/company/collectors': {
+      id: '/company/collectors'
+      path: '/collectors'
+      fullPath: '/company/collectors'
+      preLoaderRoute: typeof CompanyCollectorsRouteImport
       parentRoute: typeof CompanyRoute
     }
     '/company/ads': {
@@ -614,6 +633,7 @@ const CollectorRouteWithChildren = CollectorRoute._addFileChildren(
 
 interface CompanyRouteChildren {
   CompanyAdsRoute: typeof CompanyAdsRoute
+  CompanyCollectorsRoute: typeof CompanyCollectorsRoute
   CompanyFeedRoute: typeof CompanyFeedRoute
   CompanyOrdersRoute: typeof CompanyOrdersRoute
   CompanyProfileRoute: typeof CompanyProfileRoute
@@ -623,6 +643,7 @@ interface CompanyRouteChildren {
 
 const CompanyRouteChildren: CompanyRouteChildren = {
   CompanyAdsRoute: CompanyAdsRoute,
+  CompanyCollectorsRoute: CompanyCollectorsRoute,
   CompanyFeedRoute: CompanyFeedRoute,
   CompanyOrdersRoute: CompanyOrdersRoute,
   CompanyProfileRoute: CompanyProfileRoute,

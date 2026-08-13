@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { ClipboardList, Map, Megaphone, BarChart3, User } from "lucide-react";
+import { ClipboardList, Map, Megaphone, Users, User } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { useAuth } from "@/lib/auth";
 
