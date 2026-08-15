@@ -376,7 +376,10 @@ function AuthPage() {
               show={showPassword}
               onToggle={() => setShowPassword((v) => !v)}
               placeholder="••••••"
+              showLabel={t.show}
+              hideLabel={t.hide}
             />
+
 
             <button
               onClick={() => submit()}
