@@ -353,26 +353,12 @@ function AuthPage() {
             {mode === "signup" && (
               <>
                 <Field icon={<User size={18} />} label={t.name} value={name} onChange={setName} />
-                <div className="flex flex-col gap-2">
-                  <span className="px-1 text-[10px] font-bold" style={{ color: `${BLUE}B3` }}>{t.accountType}</span>
-                  <div className="grid grid-cols-3 gap-1.5 rounded-3xl p-1.5" style={{ background: SOFT }}>
-                    {(["citizen", "collector", "company"] as RoleChoice[]).map((r) => (
-                      <button
-                        key={r}
-                        onClick={() => setRole(r)}
-                        className="h-11 rounded-2xl text-[12px] font-extrabold transition active:scale-95"
-                        style={role === r ? { background: BLUE, color: "#fff" } : { color: `${INK}99` }}
-                      >
-                        {r === "citizen" ? t.citizen : r === "collector" ? t.collector : t.company_}
-                      </button>
-                    ))}
-                  </div>
-                </div>
                 {role === "company" && (
                   <Field icon={<Building2 size={18} />} label={t.company} value={company} onChange={setCompany} />
                 )}
               </>
             )}
+
 
             <Field
               icon={<Mail size={18} />}
