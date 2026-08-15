@@ -264,7 +264,7 @@ function AuthPage() {
       <section className="relative z-10 px-5 pb-6 pt-6">
         <div className="flex items-center justify-end">
           <button
-            onClick={() => setLang(lang === "ar" ? "ku" : "ar")}
+            onClick={switchLang}
             className="flex h-11 items-center gap-2 rounded-2xl px-4 text-[12px] font-extrabold transition active:scale-95"
             style={{ background: SOFT, border: `1px solid ${BLUE}1F`, color: BLUE }}
           >
