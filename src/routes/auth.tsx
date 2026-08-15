@@ -50,6 +50,10 @@ const T = {
     signinFail: "البريد أو كلمة السر غير صحيحة",
     welcome: "أهلاً بك",
     note: "دخول فوري بدون رسائل تأكيد",
+    googleFail: "تعذر الدخول عبر Google",
+    show: "إظهار",
+    hide: "إخفاء",
+
   },
   ku: {
     switch: "العربية",
@@ -76,8 +80,12 @@ const T = {
     signinFail: "زانیارییەکان هەڵەیە",
     welcome: "بەخێربێیت",
     note: "چوونەژوورەوەی خێرا بەبێ پەیامی پشتڕاستکردن",
+    googleFail: "نەتوانرا بە Google بچیتە ژوورەوە",
+    show: "پیشاندان",
+    hide: "شاردنەوە",
   },
 };
+
 
 const BLUE = "#1E63FF";
 const SOFT = "#EEF3FE";
@@ -123,15 +131,41 @@ function AuthPage() {
 
   const t = T[lang];
 
+  // تذكّر اللغة المختارة
+  useEffect(() => {
+    const saved = localStorage.getItem("tb_lang");
+    if (saved === "ar" || saved === "ku") setLang(saved);
+  }, []);
+  const switchLang = () => {
+    const next: Lang = lang === "ar" ? "ku" : "ar";
+    setLang(next);
+    localStorage.setItem("tb_lang", next);
+  };
+
+  // نوع الحساب المختار قبل الذهاب إلى Google
+  async function applyRole(uid: string, r: RoleChoice) {
+    await supabase.auth.updateUser({ data: { role: r } });
+    await supabase.from("user_roles").upsert({ user_id: uid, role: r }, { onConflict: "user_id,role" });
+    localStorage.removeItem("tb_role");
+  }
+
   // الجلسة محفوظة: لو المستخدم داخل فعلاً لا نطلب منه الدخول مرة أخرى
   useEffect(() => {
     if (loading || !session?.user) return;
-    const em = session.user.email?.toLowerCase();
-    const r = ((session.user.user_metadata as { role?: RoleChoice })?.role) ?? "citizen";
-    if (em === ADMIN_EMAIL) nav({ to: "/admin", replace: true });
-    else if (r === "company") nav({ to: "/company", replace: true });
-    else if (r === "collector") nav({ to: "/collector", replace: true });
-    else nav({ to: "/citizen", replace: true });
+    const user = session.user;
+    const em = user.email?.toLowerCase();
+    const meta = (user.user_metadata as { role?: RoleChoice })?.role;
+    const pending = localStorage.getItem("tb_role") as RoleChoice | null;
+    const r: RoleChoice = meta ?? pending ?? "citizen";
+    const go = () => {
+      if (em === ADMIN_EMAIL) nav({ to: "/admin", replace: true });
+      else if (r === "company") nav({ to: "/company", replace: true });
+      else if (r === "collector") nav({ to: "/collector", replace: true });
+      else nav({ to: "/citizen", replace: true });
+    };
+    if (!meta && pending) {
+      applyRole(user.id, pending).finally(go);
+    } else go();
   }, [loading, session, nav]);
 
   async function afterAuth(userEmail: string | undefined, r: RoleChoice) {
@@ -146,16 +180,21 @@ function AuthPage() {
   async function googleSignIn() {
     setGbusy(true);
     try {
+      // نحفظ نوع الحساب المختار لتطبيقه بعد رجوع Google
+      localStorage.setItem("tb_role", role);
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin,
       });
       if (result.error) {
-        toast.error((result.error as Error).message || "تعذر الدخول عبر Google");
+        localStorage.removeItem("tb_role");
+        toast.error((result.error as Error).message || t.googleFail);
         return;
       }
       if (result.redirected) return;
       const { data } = await supabase.auth.getUser();
-      const r = ((data.user?.user_metadata as { role?: RoleChoice })?.role) ?? "citizen";
+      const meta = (data.user?.user_metadata as { role?: RoleChoice })?.role;
+      const r: RoleChoice = meta ?? role;
+      if (!meta && data.user) await applyRole(data.user.id, r);
       await afterAuth(data.user?.email ?? undefined, r);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
@@ -163,6 +202,7 @@ function AuthPage() {
       setGbusy(false);
     }
   }
+
 
   async function submit() {
     const em = email.trim().toLowerCase();
@@ -224,7 +264,7 @@ function AuthPage() {
       <section className="relative z-10 px-5 pb-6 pt-6">
         <div className="flex items-center justify-end">
           <button
-            onClick={() => setLang(lang === "ar" ? "ku" : "ar")}
+            onClick={switchLang}
             className="flex h-11 items-center gap-2 rounded-2xl px-4 text-[12px] font-extrabold transition active:scale-95"
             style={{ background: SOFT, border: `1px solid ${BLUE}1F`, color: BLUE }}
           >
@@ -263,6 +303,22 @@ function AuthPage() {
             boxShadow: "0 22px 50px -28px rgba(13,42,102,0.45)",
           }}
         >
+          <div className="mb-5 flex flex-col gap-2">
+            <span className="px-1 text-[10px] font-bold" style={{ color: `${BLUE}B3` }}>{t.accountType}</span>
+            <div className="grid grid-cols-3 gap-1.5 rounded-3xl p-1.5" style={{ background: SOFT }}>
+              {(["citizen", "collector", "company"] as RoleChoice[]).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setRole(r)}
+                  className="h-11 rounded-2xl text-[12px] font-extrabold transition active:scale-95"
+                  style={role === r ? { background: BLUE, color: "#fff" } : { color: `${INK}99` }}
+                >
+                  {r === "citizen" ? t.citizen : r === "collector" ? t.collector : t.company_}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <button
             onClick={googleSignIn}
             disabled={gbusy}
@@ -272,6 +328,7 @@ function AuthPage() {
             {gbusy ? <Loader2 className="animate-spin" size={18} /> : <GoogleIcon />}
             {t.google}
           </button>
+
 
           <div className="my-5 flex items-center gap-3">
             <span className="h-px flex-1" style={{ background: `${BLUE}1F` }} />
@@ -296,26 +353,12 @@ function AuthPage() {
             {mode === "signup" && (
               <>
                 <Field icon={<User size={18} />} label={t.name} value={name} onChange={setName} />
-                <div className="flex flex-col gap-2">
-                  <span className="px-1 text-[10px] font-bold" style={{ color: `${BLUE}B3` }}>{t.accountType}</span>
-                  <div className="grid grid-cols-3 gap-1.5 rounded-3xl p-1.5" style={{ background: SOFT }}>
-                    {(["citizen", "collector", "company"] as RoleChoice[]).map((r) => (
-                      <button
-                        key={r}
-                        onClick={() => setRole(r)}
-                        className="h-11 rounded-2xl text-[12px] font-extrabold transition active:scale-95"
-                        style={role === r ? { background: BLUE, color: "#fff" } : { color: `${INK}99` }}
-                      >
-                        {r === "citizen" ? t.citizen : r === "collector" ? t.collector : t.company_}
-                      </button>
-                    ))}
-                  </div>
-                </div>
                 {role === "company" && (
                   <Field icon={<Building2 size={18} />} label={t.company} value={company} onChange={setCompany} />
                 )}
               </>
             )}
+
 
             <Field
               icon={<Mail size={18} />}
@@ -333,7 +376,10 @@ function AuthPage() {
               show={showPassword}
               onToggle={() => setShowPassword((v) => !v)}
               placeholder="••••••"
+              showLabel={t.show}
+              hideLabel={t.hide}
             />
+
 
             <button
               onClick={() => submit()}
@@ -398,6 +444,8 @@ function PasswordField({
   show,
   onToggle,
   placeholder,
+  showLabel,
+  hideLabel,
 }: {
   label: string;
   value: string;
@@ -405,7 +453,10 @@ function PasswordField({
   show: boolean;
   onToggle: () => void;
   placeholder?: string;
+  showLabel: string;
+  hideLabel: string;
 }) {
+
   return (
     <label className="flex flex-col gap-1.5">
       <span className="px-1 text-[10px] font-bold" style={{ color: `${BLUE}B3` }}>{label}</span>
