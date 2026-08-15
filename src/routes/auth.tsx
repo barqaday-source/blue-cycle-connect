@@ -444,6 +444,8 @@ function PasswordField({
   show,
   onToggle,
   placeholder,
+  showLabel,
+  hideLabel,
 }: {
   label: string;
   value: string;
@@ -451,7 +453,10 @@ function PasswordField({
   show: boolean;
   onToggle: () => void;
   placeholder?: string;
+  showLabel: string;
+  hideLabel: string;
 }) {
+
   return (
     <label className="flex flex-col gap-1.5">
       <span className="px-1 text-[10px] font-bold" style={{ color: `${BLUE}B3` }}>{label}</span>
