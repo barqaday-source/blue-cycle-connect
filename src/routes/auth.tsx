@@ -80,8 +80,12 @@ const T = {
     signinFail: "زانیارییەکان هەڵەیە",
     welcome: "بەخێربێیت",
     note: "چوونەژوورەوەی خێرا بەبێ پەیامی پشتڕاستکردن",
+    googleFail: "نەتوانرا بە Google بچیتە ژوورەوە",
+    show: "پیشاندان",
+    hide: "شاردنەوە",
   },
 };
+
 
 const BLUE = "#1E63FF";
 const SOFT = "#EEF3FE";
