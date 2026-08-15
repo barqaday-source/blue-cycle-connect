@@ -131,15 +131,41 @@ function AuthPage() {
 
   const t = T[lang];
 
+  // تذكّر اللغة المختارة
+  useEffect(() => {
+    const saved = localStorage.getItem("tb_lang");
+    if (saved === "ar" || saved === "ku") setLang(saved);
+  }, []);
+  const switchLang = () => {
+    const next: Lang = lang === "ar" ? "ku" : "ar";
+    setLang(next);
+    localStorage.setItem("tb_lang", next);
+  };
+
+  // نوع الحساب المختار قبل الذهاب إلى Google
+  async function applyRole(uid: string, r: RoleChoice) {
+    await supabase.auth.updateUser({ data: { role: r } });
+    await supabase.from("user_roles").upsert({ user_id: uid, role: r }, { onConflict: "user_id,role" });
+    localStorage.removeItem("tb_role");
+  }
+
   // الجلسة محفوظة: لو المستخدم داخل فعلاً لا نطلب منه الدخول مرة أخرى
   useEffect(() => {
     if (loading || !session?.user) return;
-    const em = session.user.email?.toLowerCase();
-    const r = ((session.user.user_metadata as { role?: RoleChoice })?.role) ?? "citizen";
-    if (em === ADMIN_EMAIL) nav({ to: "/admin", replace: true });
-    else if (r === "company") nav({ to: "/company", replace: true });
-    else if (r === "collector") nav({ to: "/collector", replace: true });
-    else nav({ to: "/citizen", replace: true });
+    const user = session.user;
+    const em = user.email?.toLowerCase();
+    const meta = (user.user_metadata as { role?: RoleChoice })?.role;
+    const pending = localStorage.getItem("tb_role") as RoleChoice | null;
+    const r: RoleChoice = meta ?? pending ?? "citizen";
+    const go = () => {
+      if (em === ADMIN_EMAIL) nav({ to: "/admin", replace: true });
+      else if (r === "company") nav({ to: "/company", replace: true });
+      else if (r === "collector") nav({ to: "/collector", replace: true });
+      else nav({ to: "/citizen", replace: true });
+    };
+    if (!meta && pending) {
+      applyRole(user.id, pending).finally(go);
+    } else go();
   }, [loading, session, nav]);
 
   async function afterAuth(userEmail: string | undefined, r: RoleChoice) {
@@ -154,16 +180,21 @@ function AuthPage() {
   async function googleSignIn() {
     setGbusy(true);
     try {
+      // نحفظ نوع الحساب المختار لتطبيقه بعد رجوع Google
+      localStorage.setItem("tb_role", role);
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin,
       });
       if (result.error) {
-        toast.error((result.error as Error).message || "تعذر الدخول عبر Google");
+        localStorage.removeItem("tb_role");
+        toast.error((result.error as Error).message || t.googleFail);
         return;
       }
       if (result.redirected) return;
       const { data } = await supabase.auth.getUser();
-      const r = ((data.user?.user_metadata as { role?: RoleChoice })?.role) ?? "citizen";
+      const meta = (data.user?.user_metadata as { role?: RoleChoice })?.role;
+      const r: RoleChoice = meta ?? role;
+      if (!meta && data.user) await applyRole(data.user.id, r);
       await afterAuth(data.user?.email ?? undefined, r);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
@@ -171,6 +202,7 @@ function AuthPage() {
       setGbusy(false);
     }
   }
+
 
   async function submit() {
     const em = email.trim().toLowerCase();
