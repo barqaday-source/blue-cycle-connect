@@ -50,6 +50,10 @@ const T = {
     signinFail: "البريد أو كلمة السر غير صحيحة",
     welcome: "أهلاً بك",
     note: "دخول فوري بدون رسائل تأكيد",
+    googleFail: "تعذر الدخول عبر Google",
+    show: "إظهار",
+    hide: "إخفاء",
+
   },
   ku: {
     switch: "العربية",
