@@ -303,6 +303,22 @@ function AuthPage() {
             boxShadow: "0 22px 50px -28px rgba(13,42,102,0.45)",
           }}
         >
+          <div className="mb-5 flex flex-col gap-2">
+            <span className="px-1 text-[10px] font-bold" style={{ color: `${BLUE}B3` }}>{t.accountType}</span>
+            <div className="grid grid-cols-3 gap-1.5 rounded-3xl p-1.5" style={{ background: SOFT }}>
+              {(["citizen", "collector", "company"] as RoleChoice[]).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setRole(r)}
+                  className="h-11 rounded-2xl text-[12px] font-extrabold transition active:scale-95"
+                  style={role === r ? { background: BLUE, color: "#fff" } : { color: `${INK}99` }}
+                >
+                  {r === "citizen" ? t.citizen : r === "collector" ? t.collector : t.company_}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <button
             onClick={googleSignIn}
             disabled={gbusy}
@@ -312,6 +328,7 @@ function AuthPage() {
             {gbusy ? <Loader2 className="animate-spin" size={18} /> : <GoogleIcon />}
             {t.google}
           </button>
+
 
           <div className="my-5 flex items-center gap-3">
             <span className="h-px flex-1" style={{ background: `${BLUE}1F` }} />
