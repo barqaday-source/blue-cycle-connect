@@ -322,6 +322,9 @@ function AuthPage() {
                 </button>
               ))}
             </div>
+            {!role && (
+              <span className="px-1 text-[10px] font-bold" style={{ color: "#DC2626" }}>{t.roleBad}</span>
+            )}
           </div>
 
           <button
