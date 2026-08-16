@@ -51,6 +51,7 @@ const T = {
     welcome: "أهلاً بك",
     note: "دخول فوري بدون رسائل تأكيد",
     googleFail: "تعذر الدخول عبر Google",
+    roleBad: "اختر نوع الحساب أولاً",
     show: "إظهار",
     hide: "إخفاء",
 
@@ -81,6 +82,7 @@ const T = {
     welcome: "بەخێربێیت",
     note: "چوونەژوورەوەی خێرا بەبێ پەیامی پشتڕاستکردن",
     googleFail: "نەتوانرا بە Google بچیتە ژوورەوە",
+    roleBad: "سەرەتا جۆری ئاکاونت هەڵبژێرە",
     show: "پیشاندان",
     hide: "شاردنەوە",
   },
@@ -120,7 +122,7 @@ function AuthPage() {
   const { refresh, session, loading } = useAuth();
   const [lang, setLang] = useState<Lang>("ar");
   const [mode, setMode] = useState<Mode>("signin");
-  const [role, setRole] = useState<RoleChoice>("citizen");
+  const [role, setRole] = useState<RoleChoice | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -178,10 +180,11 @@ function AuthPage() {
   }
 
   async function googleSignIn() {
+    if (!role) return toast.error(t.roleBad);
     setGbusy(true);
     try {
       // نحفظ نوع الحساب المختار لتطبيقه بعد رجوع Google
-      localStorage.setItem("tb_role", role);
+      localStorage.setItem("tb_role", role!);
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin,
       });
@@ -193,7 +196,7 @@ function AuthPage() {
       if (result.redirected) return;
       const { data } = await supabase.auth.getUser();
       const meta = (data.user?.user_metadata as { role?: RoleChoice })?.role;
-      const r: RoleChoice = meta ?? role;
+      const r: RoleChoice = meta ?? role!;
       if (!meta && data.user) await applyRole(data.user.id, r);
       await afterAuth(data.user?.email ?? undefined, r);
     } catch (e) {
@@ -205,6 +208,7 @@ function AuthPage() {
 
 
   async function submit() {
+    if (mode === "signup" && !role) return toast.error(t.roleBad);
     const em = email.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) return toast.error(t.emailBad);
     if (password.length < 6) return toast.error(t.passBad);
@@ -218,6 +222,7 @@ function AuthPage() {
         return afterAuth(data.user?.email, r);
       }
 
+      if (!role) return toast.error(t.roleBad);
       if (!name.trim()) return toast.error(t.nameBad);
       if (role === "company" && !company.trim()) return toast.error(t.companyBad);
 
@@ -240,7 +245,7 @@ function AuthPage() {
         if (retry.error) return toast.error(retry.error.message);
         s = retry.data.session;
       }
-      await afterAuth(s?.user?.email, role);
+      await afterAuth(s?.user?.email, role!);
     } finally {
       setBusy(false);
     }
@@ -317,11 +322,14 @@ function AuthPage() {
                 </button>
               ))}
             </div>
+            {!role && (
+              <span className="px-1 text-[10px] font-bold" style={{ color: "#DC2626" }}>{t.roleBad}</span>
+            )}
           </div>
 
           <button
             onClick={googleSignIn}
-            disabled={gbusy}
+            disabled={gbusy || !role}
             className="flex h-[58px] w-full items-center justify-center gap-3 rounded-3xl text-[14px] font-extrabold transition active:scale-[0.98] disabled:opacity-60"
             style={{ background: "rgba(255,255,255,0.85)", border: `1px solid ${BLUE}26`, color: INK }}
           >
@@ -475,7 +483,7 @@ function PasswordField({
           onClick={onToggle}
           className="rounded-full p-1.5 transition active:scale-90"
           style={{ color: `${BLUE}B3` }}
-          aria-label={show ? "إخفاء" : "إظهار"}
+          aria-label={show ? hideLabel : showLabel}
         >
           {show ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
