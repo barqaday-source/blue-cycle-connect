@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { verifyAdminAccess, canAccessRoute, canAccessData } from "@/lib/rbac";
 
 export type AppRole = "admin" | "company" | "collector" | "citizen";
 export const ADMIN_EMAIL = "barqaday@gmail.com";
@@ -12,9 +13,12 @@ export interface Profile {
   phone: string | null;
   company_name: string | null;
   city: string | null;
+  governorate: string | null;
   avatar_url: string | null;
   lat: number | null;
   lng: number | null;
+  is_company?: boolean;
+  created_at?: string;
 }
 
 interface AuthState {
@@ -27,6 +31,8 @@ interface AuthState {
   isCompany: boolean;
   isCollector: boolean;
   isCitizen: boolean;
+  canAccessRoute: (route: string) => boolean;
+  canAccessData: (dataType: string) => boolean;
   signOut: () => Promise<void>;
   refresh: () => Promise<void>;
 }
@@ -40,14 +46,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const loadExtras = async (uid: string, email: string | null) => {
-    const [{ data: p }, { data: r }] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
-      supabase.from("user_roles").select("role").eq("user_id", uid),
-    ]);
-    setProfile((p as Profile) ?? null);
-    const list = (r ?? []).map((x: { role: AppRole }) => x.role);
-    if (email?.toLowerCase() === ADMIN_EMAIL && !list.includes("admin")) list.push("admin");
-    setRoles(list);
+    try {
+      const [{ data: p }, { data: r }] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", uid),
+      ]);
+
+      setProfile((p as Profile) ?? null);
+
+      const list = (r ?? []).map((x: { role: AppRole }) => x.role);
+
+      // Check if user is admin by email
+      if (email && verifyAdminAccess(email)) {
+        if (!list.includes("admin")) {
+          list.push("admin");
+        }
+      }
+
+      setRoles(list);
+    } catch (error) {
+      console.error("Error loading auth extras:", error);
+      setProfile(null);
+      setRoles([]);
+    }
   };
 
   useEffect(() => {
@@ -60,14 +81,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setRoles([]);
       }
     });
+
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       if (data.session?.user) {
         loadExtras(data.session.user.id, data.session.user.email ?? null).finally(() =>
-          setLoading(false),
+          setLoading(false)
         );
-      } else setLoading(false);
+      } else {
+        setLoading(false);
+      }
     });
+
     return () => sub.subscription.unsubscribe();
   }, []);
 
@@ -77,17 +102,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile,
     roles,
     loading,
-    isAdmin: roles.includes("admin") || session?.user?.email?.toLowerCase() === ADMIN_EMAIL,
+    isAdmin: roles.includes("admin") || (session?.user?.email ? verifyAdminAccess(session.user.email) : false),
     isCompany: roles.includes("company"),
     isCollector: roles.includes("collector"),
     isCitizen: roles.includes("citizen"),
+    canAccessRoute: (route: string) => canAccessRoute(roles, route),
+    canAccessData: (dataType: string) => canAccessData(roles, dataType),
     signOut: async () => {
       await supabase.auth.signOut();
+      setSession(null);
+      setProfile(null);
+      setRoles([]);
     },
     refresh: async () => {
-      if (session?.user) await loadExtras(session.user.id, session.user.email ?? null);
+      if (session?.user) {
+        await loadExtras(session.user.id, session.user.email ?? null);
+      }
     },
   };
+
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
