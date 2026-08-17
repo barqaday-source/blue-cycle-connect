@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Users, Building2, ChevronLeft, LogOut, MapPin, MessageCircle, Recycle, Truck } from "lucide-react";
+import { Star, Phone, MapPin, Users } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { AvatarUpload } from "@/components/AvatarUpload";
 import { useAuth } from "@/lib/auth";
@@ -15,49 +15,108 @@ const SUPPORT_WA = "https://wa.me/9647700000000?text=" + encodeURIComponent("م�
 function CompanyProfile() {
   const { profile, user, signOut } = useAuth();
   const nav = useNavigate();
-  type Item = { Icon: typeof Building2; t: string; to?: string; href?: string; action?: () => void };
-  const items: Item[] = [
-    { Icon: Building2, t: "بيانات المعمل", to: "/account/edit" },
-    { Icon: Users, t: "المجمعون التابعون لنا", to: "/company/collectors" },
-    { Icon: Recycle, t: "أنواع المواد التي نشتريها", to: "/company/ads" },
-    { Icon: MapPin, t: "نطاق المحافظات المغطاة", to: "/account/address" },
-    { Icon: Truck, t: "السائقون والآليات", action: () => toast.message("قريباً — إدارة السائقين") },
-    { Icon: MessageCircle, t: "الدعم الفني (واتساب)", href: SUPPORT_WA },
+
+  // sample collectors fallback
+  const collectors = profile?.collectors ?? [
+    { id: 1, name: "جمعية الخير", distance: "1.2 كم", phone: "+9647700000001" },
+    { id: 2, name: "مجمّع بغداد", distance: "3.4 كم", phone: "+9647700000002" },
+    { id: 3, name: "نقطة الحارة", distance: "5.6 كم", phone: "+9647700000003" },
   ];
+
   return (
-    <>
-      <AppHeader title="حساب الشركة" subtitle="تدوير بلو" />
-      <div className="glass-card flex items-center gap-4 rounded-3xl p-5">
-        <AvatarUpload size={64} fallback={(profile?.company_name?.[0] ?? profile?.full_name?.[0] ?? "ش").toUpperCase()} />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-base font-extrabold">{profile?.company_name ?? profile?.full_name ?? "شركة تدوير"}</p>
-          <p className="truncate text-[12px] text-muted-foreground">{profile?.phone ?? user?.email}</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-[#f8fafc] px-4 py-6">
+      <AppHeader title="الملف التجاري" />
 
-      <div className="mt-5 flex flex-col gap-2">
-        {items.map((it) => {
-          const inner = (
-            <>
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary"><it.Icon size={18} /></span>
-              <span className="min-w-0 flex-1 truncate text-sm font-bold">{it.t}</span>
-              <ChevronLeft size={16} className="text-muted-foreground" />
-            </>
-          );
-          if (it.href)
-            return <a key={it.t} href={it.href} target="_blank" rel="noreferrer" className="glass-card flex items-center gap-3 rounded-2xl p-4 text-right transition active:scale-[0.98]">{inner}</a>;
-          if (it.to)
-            return <Link key={it.t} to={it.to} className="glass-card flex items-center gap-3 rounded-2xl p-4 text-right transition active:scale-[0.98]">{inner}</Link>;
-          return <button key={it.t} onClick={it.action} className="glass-card flex items-center gap-3 rounded-2xl p-4 text-right transition active:scale-[0.98]">{inner}</button>;
-        })}
-      </div>
+      <div className="mx-auto max-w-[920px] space-y-6">
+        {/* Hero */}
+        <section className="rounded-2xl bg-white p-4" style={{ padding: 24 }}>
+          <div className="flex items-center gap-4">
+            <div className="shrink-0">
+              <div className="h-20 w-20 overflow-hidden rounded-2xl bg-slate-100" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg font-semibold text-[#064e3b]">{profile?.company_name ?? "شركة تدوير"}</h2>
+              <p className="mt-1 text-sm text-slate-600">{profile?.short_description ?? "شركة متخصصة في جمع وتدوير المخلفات"}</p>
 
-      <button
-        onClick={async () => { await signOut(); nav({ to: "/auth" }); }}
-        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 py-3 text-sm font-extrabold text-destructive active:scale-[0.98]"
-      >
-        <LogOut size={16} /> تسجيل الخروج
-      </button>
-    </>
+              <div className="mt-3 flex items-center gap-3">
+                <div className="inline-flex items-center gap-1 rounded-full bg-[#064e3b] px-3 py-1 text-sm font-semibold text-white">4.5 <Star size={14} /></div>
+                <div className="text-sm text-slate-500">تقييم العملاء</div>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-end gap-2">
+              <button className="rounded-full bg-transparent p-2 text-[#064e3b]">تحرير</button>
+              <button
+                onClick={async () => {
+                  await signOut();
+                  nav({ to: "/auth" });
+                }}
+                className="rounded-full bg-transparent p-2 text-[#ef4444]"
+              >
+                تسجيل الخروج
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Information list */}
+        <section className="rounded-2xl bg-white p-4" style={{ padding: 24 }}>
+          <h3 className="text-sm font-semibold text-slate-700">معلومات</h3>
+          <ul className="mt-3 space-y-3 text-sm text-slate-600">
+            <li className="flex items-start gap-3">
+              <MapPin size={18} className="text-[#064e3b]" />
+              <div>
+                <div className="font-medium text-slate-800">العنوان</div>
+                <div className="mt-1">{profile?.address ?? "لا يوجد عنوان محدد"}</div>
+              </div>
+            </li>
+
+            <li className="flex items-start gap-3">
+              <Phone size={18} className="text-[#064e3b]" />
+              <div>
+                <div className="font-medium text-slate-800">جهة الاتصال</div>
+                <div className="mt-1">{profile?.phone ?? user?.email}</div>
+              </div>
+            </li>
+
+            <li className="flex items-start gap-3">
+              <Users size={18} className="text-[#064e3b]" />
+              <div>
+                <div className="font-medium text-slate-800">سعة التدوير</div>
+                <div className="mt-1">{profile?.capacity ?? "غير محددة"}</div>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        {/* Collectors list */}
+        <section className="rounded-2xl bg-white p-4" style={{ padding: 24 }}>
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-700">شركاء التجميع</h3>
+            <Link to="/company/collectors" className="text-sm text-[#064e3b]">عرض الكل</Link>
+          </div>
+
+          <div className="mt-3 space-y-3 max-h-[240px] overflow-auto pr-2">
+            {collectors.map((c: any) => (
+              <div key={c.id} className="flex items-center justify-between gap-3 rounded-xl bg-white p-3 shadow-sm">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-slate-100" />
+                    <div className="min-w-0">
+                      <div className="truncate font-semibold text-slate-800">{c.name}</div>
+                      <div className="mt-1 text-xs text-slate-500">{c.distance}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <a href={`tel:${c.phone}`} className="inline-flex items-center justify-center rounded-md bg-[#064e3b] px-3 py-2 text-sm font-medium text-white">اتصال</a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </div>
   );
 }

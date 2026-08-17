@@ -1,28 +1,53 @@
 import type { ReactNode } from "react";
-import { SideMenu } from "@/components/SideMenu";
+import { ArrowLeft, Menu } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 interface Props {
   title?: ReactNode;
-  subtitle?: ReactNode;
-  avatar?: ReactNode;
+  left?: ReactNode;
   right?: ReactNode;
-  back?: ReactNode;
-  hideMenu?: boolean;
+  onBack?: () => void;
 }
 
-export function AppHeader({ title, subtitle, avatar, right, back, hideMenu }: Props) {
+/**
+ * Minimal global header following the new design system:
+ * - No borders, no shadows
+ * - Left: back/menu
+ * - Center: page title
+ * - Right: contextual icon
+ */
+export function AppHeader({ title, left, right, onBack }: Props) {
   return (
-    <header className="sticky top-0 z-30 -mx-4 mb-2 bg-background/80 px-4 pb-4 pt-5 backdrop-blur-xl">
-      <div className="glass grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-3xl px-2.5 py-2.5 float-in">
+    <header className="w-full px-4 py-4">
+      <div className="mx-auto flex w-full max-w-[920px] items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          {/* Left area: prefer an explicit left node, else a back button */}
+          {left ?? (
+            <button
+              aria-label="رجوع"
+              onClick={onBack}
+              className="grid h-9 w-9 place-items-center rounded-full bg-transparent text-[#064e3b]"
+            >
+              <ArrowLeft size={18} />
+            </button>
+          )}
+        </div>
 
-        <div className="shrink-0">
-          {back ?? avatar ?? (!hideMenu ? <SideMenu /> : null)}
-        </div>
         <div className="min-w-0 text-center">
-          {subtitle && <p className="text-[10px] font-medium text-muted-foreground">{subtitle}</p>}
-          {title && <h1 className="truncate text-[15px] font-extrabold text-foreground">{title}</h1>}
+          {title ? (
+            <h1 className="truncate text-lg font-semibold text-[#064e3b]">{title}</h1>
+          ) : (
+            <div />
+          )}
         </div>
-        <div className="shrink-0">{right}</div>
+
+        <div className="flex items-center gap-2">
+          {right ?? (
+            <Link to="/profile" className="grid h-9 w-9 place-items-center rounded-full bg-transparent text-[#064e3b]">
+              <Menu size={18} />
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   );
